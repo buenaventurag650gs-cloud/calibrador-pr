@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Calibrador de perillas</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link href="fonts/fonts.css" rel="stylesheet">
+<link href="reglamentos/reglamentos.css" rel="stylesheet">
 <style>
 /* Institutional layout: navy masthead with step tabs; one zone x perilla matrix seen four ways (Perillas, Calibrar, Prácticas y divisa, Ficha). Transect colors are data, not chrome. */
 :root{
@@ -370,6 +370,7 @@ svg.ch rect[data-tip]:hover,svg.ch path[data-tip]:hover{filter:brightness(1.12)}
       <button class="step" role="tab" id="tab-ficha"><i data-lucide="file-text" class="ic"></i>4 · Ficha del transecto</button>
       <button class="step" role="tab" id="tab-graficos"><i data-lucide="chart-column" class="ic"></i>5 · Gráficos</button>
       <button class="step" role="tab" id="tab-glosario"><i data-lucide="book-a" class="ic"></i>6 · Glosario</button>
+      <button class="step" role="tab" id="tab-reglamentos"><i data-lucide="scroll-text" class="ic"></i>7 · Reglamentos</button>
     </nav>
   </div>
 </header>
@@ -500,7 +501,28 @@ svg.ch rect[data-tip]:hover,svg.ch path[data-tip]:hover{filter:brightness(1.12)}
     </div>
     <div id="glosario" style="display:flex;flex-direction:column;gap:14px"></div>
   </section>
+
+  <!-- 7 -->
+  <section class="view" id="v-reglamentos" aria-label="Reglamentos">
+    <div class="card">
+      <div class="bar" style="justify-content:space-between;align-items:flex-start">
+        <div><h2 style="font-size:18px"><i data-lucide="scroll-text" class="ic" style="width:20px;height:20px;color:var(--accent);margin-right:6px"></i>Borradores de reglamento</h2>
+          <p class="lead">Cada reglamento del plan regulador con sus valores conectados a las perillas: cuando calibras una perilla, los artículos y tablas que la usan se actualizan solos. Puedes editar la redacción y descargar el reglamento en Word.</p></div>
+        <div class="bar">
+          <button class="btn" id="rgEdit" aria-pressed="false"></button>
+          <button class="btn" id="rgReset" title="Volver al borrador original"><i data-lucide="rotate-ccw" class="ic"></i>Restablecer</button>
+          <button class="btn" id="rgCopy"><i data-lucide="copy" class="ic"></i>Copiar</button>
+          <button class="btn primary" id="rgWord"><i data-lucide="file-down" class="ic"></i>Descargar Word</button>
+        </div>
+      </div>
+    </div>
+    <div class="rg-wrap">
+      <nav class="rg-side" id="rgSide" aria-label="Reglamentos"></nav>
+      <div class="rg-main" id="rgMain"></div>
+    </div>
+  </section>
 </div>
+<div class="rg-picker" id="rgPicker" role="dialog" aria-label="Insertar valor"></div>
 <div class="tip" id="tip" role="tooltip"></div>
 <div class="modal" id="bookModal" role="dialog" aria-modal="true" aria-labelledby="bookTitle">
   <div class="dlg">
@@ -549,9 +571,12 @@ svg.ch rect[data-tip]:hover,svg.ch path[data-tip]:hover{filter:brightness(1.12)}
   </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="https://cdn.jsdelivr.net/npm/lucide@0.460.0/dist/umd/lucide.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+<script src="vendor/lucide-0.460.0.min.js"></script>
+<script src="vendor/jspdf-2.5.1.umd.min.js"></script>
+<script src="vendor/jspdf-autotable-3.8.2.min.js"></script>
+<script src="vendor/lz-string-1.5.0.min.js"></script>
+<script src="reglamentos/textos.js"></script>
+<script src="reglamentos/motor.js"></script>
 
 <script>
 (function(){
@@ -896,10 +921,10 @@ function renderGlobal(){
   $('globalTxt').textContent=n?`${n} alerta${n>1?'s':''}`:'Transecto coherente';
   $('hdrCanton').textContent=`${S.datos.canton||'Cantón sin nombre'}${provOf(S.datos.canton)?', '+provOf(S.datos.canton):''} · Plan regulador territorial · valores precargados: supuestos de partida`;
 }
-const VIEWS=['perillas','calibrar','practicas','ficha','graficos','glosario'];
+const VIEWS=['perillas','calibrar','practicas','ficha','graficos','glosario','reglamentos'];
 function setView(v){
   S.view=v; VIEWS.forEach(x=>{ $('tab-'+x).setAttribute('aria-selected',x===v); $('v-'+x).classList.toggle('show',x===v); });
-  ({perillas:renderLamina,calibrar:renderCalibrar,practicas:renderPracticas,ficha:renderFicha,graficos:renderGraficos,glosario:renderGlosario})[v]();
+  ({perillas:renderLamina,calibrar:renderCalibrar,practicas:renderPracticas,ficha:renderFicha,graficos:renderGraficos,glosario:renderGlosario,reglamentos:()=>{ if(window.REG) REG.render(); }})[v]();
   renderGlobal(); save();
 }
 VIEWS.forEach(x=>$('tab-'+x).addEventListener('click',()=>setView(x)));
@@ -1260,10 +1285,10 @@ function renderScenarios(){
   $('scenarioSel').innerHTML='<option value="">Valores de partida</option>'+Object.keys(store.scenarios).sort().map(n=>`<option>${esc(n)}</option>`).join('');
   $('scenarioSel').value=store.current||''; $('delBtn').disabled=!store.current;
 }
-const snap=()=>JSON.parse(JSON.stringify({zonas:S.zonas,values:S.values,datos:S.datos,pract:S.pract,usos:S.usos}));
+const snap=()=>JSON.parse(JSON.stringify({zonas:S.zonas,values:S.values,datos:S.datos,pract:S.pract,usos:S.usos,regs:S.regs||{}}));
 $('scenarioSel').addEventListener('change',e=>{
   const n=e.target.value; store.current=n||null;
-  if(n){ const s=JSON.parse(JSON.stringify(store.scenarios[n])); S.zonas=s.zonas||[]; rebuildZones(S.zonas); S.values=s.values; S.datos=s.datos; S.pract=s.pract||freshPract(); S.usos=normUsos(s.usos); ensureZoneData(); } else { S.zonas=[]; rebuildZones([]); S.values=freshValues(); S.datos=freshDatos(); S.pract=freshPract(); S.usos=freshUsos(); }
+  if(n){ const s=JSON.parse(JSON.stringify(store.scenarios[n])); S.zonas=s.zonas||[]; rebuildZones(S.zonas); S.values=s.values; S.datos=s.datos; S.pract=s.pract||freshPract(); S.usos=normUsos(s.usos); S.regs=s.regs||{}; ensureZoneData(); } else { S.zonas=[]; rebuildZones([]); S.values=freshValues(); S.datos=freshDatos(); S.pract=freshPract(); S.usos=freshUsos(); }
   renderLegend();
   $('scenarioName').value=n||''; renderScenarios(); setView(S.view);
 });
@@ -1279,7 +1304,7 @@ $('ioClose').addEventListener('click',()=>$('ioPanel').classList.remove('show'))
 $('ioCopy').addEventListener('click',()=>copyText($('io').value,'Texto copiado'));
 $('ioImport').addEventListener('click',()=>{
   try{ const o=JSON.parse($('io').value); if(!o.values||!o.values.T1||!o.datos) throw 0;
-    S.zonas=o.zonas||[]; rebuildZones(S.zonas); S.values=o.values; S.datos=o.datos; S.pract=o.pract||freshPract(); S.usos=normUsos(o.usos); ensureZoneData(); renderLegend();
+    S.zonas=o.zonas||[]; rebuildZones(S.zonas); S.values=o.values; S.datos=o.datos; S.pract=o.pract||freshPract(); S.usos=normUsos(o.usos); S.regs=o.regs||{}; ensureZoneData(); renderLegend();
     const n=(o.escenario&&o.escenario!=='Valores de partida')?o.escenario:'Importado';
     store.scenarios[n]=snap(); store.current=n; save(); renderScenarios(); setView(S.view);
     $('ioPanel').classList.remove('show'); toast('Escenario importado');
@@ -1812,12 +1837,13 @@ if(STANDALONE&&window.LZString){
   const h=location.hash;
   if(h.startsWith('#s=')){
     try{ const o=JSON.parse(LZString.decompressFromEncodedURIComponent(h.slice(3))); if(!o||!o.values) throw 0;
-      S.zonas=o.zonas||[]; rebuildZones(S.zonas); S.values=o.values; S.datos=o.datos; S.pract=o.pract||freshPract(); S.usos=normUsos(o.usos); ensureZoneData();
+      S.zonas=o.zonas||[]; rebuildZones(S.zonas); S.values=o.values; S.datos=o.datos; S.pract=o.pract||freshPract(); S.usos=normUsos(o.usos); S.regs=o.regs||{}; ensureZoneData();
       let n=(o.escenario||'Compartido')+' (enlace)'; store.scenarios[n]=snap(); store.current=n; save();
       history.replaceState(null,'',location.pathname); setTimeout(()=>toast('Escenario abierto desde un enlace compartido'),400);
     }catch(e){ setTimeout(()=>toast('El enlace no trae un escenario válido'),400); }
   }
 }
+window.CAL={get S(){return S},get ZONES(){return ZONES},get ZID(){return ZID},get ZBY(){return ZBY},get store(){return store},P,PBY,NUM,TXT,BLOQUES,BIDX,USOS,USO_CODES,DERIVED,V,applies,tplOf,nf,esc,ic,chip,zchips,results,totals,usoCount,save,toast,copyText,isInc,incz,setView};
 window.__buildBooklet=buildBooklet; window.__preload=preloadPdfIcons;
 
 renderCanton(); renderLegend(); renderScenarios(); setView(S.view||'calibrar');
