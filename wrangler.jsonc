@@ -1,0 +1,9 @@
+{
+  // Calibrador de perillas: sitio estático servido por Cloudflare Workers (static assets)
+  "name": "calibrador-perillas",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./public",
+    "not_found_handling": "single-page-application"
+  }
+}
