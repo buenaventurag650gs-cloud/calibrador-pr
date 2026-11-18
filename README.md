@@ -59,6 +59,8 @@ Cada reglamento del plan (00 Generalidades a 09 Audiencia Pública) tiene un bor
 
 Estado de los borradores:
 - 01 Zonificación: adaptado del Reglamento de Zonificación y Forma Urbana de Liberia.
+- 02 Fraccionamiento y Urbanizaciones: adaptado del Reglamento de Fraccionamiento y Urbanización de Liberia.
+- 03 Mapa Oficial: adaptado del Reglamento de Mapa Oficial de Liberia. Las tablas de inventario (bienes públicos, vialidad, zonas de interés municipal) son propias de cada cantón y quedan como `[[ ]]` para incorporarlas como anexo.
 - Los demás: se puede crear un esqueleto desde las perillas mientras llega el texto base.
 
 Formato del texto en `textos.js`: ver el comentario al inicio de `motor.js`.

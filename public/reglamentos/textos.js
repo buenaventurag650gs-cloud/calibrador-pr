@@ -280,3 +280,305 @@ Los corredores biológicos que deben conservarse dentro de los predios se regula
 }
 ]
 };
+
+/* 02 Fraccionamiento y Urbanizaciones: adaptado del Reglamento de Fraccionamiento y Urbanización del Plan Regulador de Liberia. */
+window.REG_BASE['02'] = {
+id: '02',
+t: 'Reglamento de Fraccionamiento y Urbanizaciones',
+fuente: 'Borrador adaptado del Reglamento de Fraccionamiento y Urbanización del Plan Regulador de Liberia. Los valores salen del calibrador.',
+caps: [
+{ t: 'Disposiciones generales',
+  x: `Que el artículo 50 de la Constitución Política establece a favor de todos los habitantes de la República el derecho a un ambiente sano y ecológicamente equilibrado, que incluye la conservación, el uso y el manejo sostenible del medio ambiente, así como el cumplimiento de la función social de la propiedad.
+Que la Municipalidad de {{canton}}, de conformidad con las facultades que le confieren el artículo 169 de la Constitución Política, el Código Municipal, la Ley de Planificación Urbana N.º 4240 y la Ley General de Caminos Públicos N.º 5060, promulga el presente Reglamento de Fraccionamiento y Urbanizaciones, uno de los reglamentos de desarrollo urbano previstos en el inciso 2) del artículo 21 de la Ley N.º 4240.
+Que el diseño geométrico de todo fraccionamiento o urbanización debe ser acorde con las condiciones ecológicas del área, incluyendo la vegetación y el paisaje, considerando tanto el terreno a desarrollar como sus inmediaciones; los lotes resultantes deben tener acceso adecuado a la vía pública.
+Que las zonas de carácter comunal deben ser accesibles a toda la población y contribuir con el mejoramiento de la imagen urbana y la calidad de vida de la comunidad, por lo que la Ley de Planificación Urbana obliga la cesión de áreas para uso público en las urbanizaciones.
+Que el fraccionamiento sin planificación y sin control es perjudicial para la calidad de vida de los habitantes, pues promueve el hacinamiento y reduce las posibilidades de crear espacios libres y verdes.
+Que, para los efectos del presente reglamento, el término Cuadrante Urbano definido por el Instituto Nacional de Vivienda y Urbanismo se equipara a {{zonas:cu}}, según lo establecido en el Reglamento de Zonificación y Forma Urbana.`,
+  arts: [
+  { id: 'objetivo', t: 'Objetivo', x: `Fijar los principios y elementos que deben considerarse para la división y habilitación urbana de los predios donde se proyecten fraccionamientos, urbanizaciones y conjuntos residenciales. Este reglamento establece los requisitos en relación con derechos de vía, acceso a la vía pública, lotificación, amanzanamiento, parcelamiento, cesión de áreas para uso público, accesos excepcionales para uso residencial, servidumbres agrícolas, pecuarias o forestales, y normas mínimas de vialidad.` },
+  { id: 'alcance', t: 'Alcance', x: `El presente reglamento se aplica en todo el cantón de {{canton}}, de acuerdo con las disposiciones locales emitidas por el Gobierno Municipal en materia de fraccionamientos y urbanizaciones. Estas disposiciones deben complementarse con los lineamientos mínimos del Reglamento de Fraccionamiento y Urbanizaciones del INVU.` },
+  { id: 'responsabilidad', t: 'Responsabilidad institucional', x: `Las personas funcionarias de la Municipalidad que intervienen en la tramitación de consulta y visado de planos en lo referido a este reglamento son responsables ante los órganos superiores.` },
+  { id: 'infracciones', t: 'Infracciones', x: `Las infracciones a lo dispuesto en este reglamento se sancionan de conformidad con el artículo 401, inciso 5, del Código Penal, en tanto no sean aplicables las penas del Capítulo XXI de la Ley de Construcciones N.º 833. Estas acciones pueden ser antecedidas o complementadas por las medidas de policía de los artículos 87 y 88 de la Ley de Construcciones y el artículo 10, incisos 3 al 5, de la Ley de Planificación Urbana N.º 4240.
+Las personas funcionarias municipales deben además dar cumplimiento a la Ley de Protección al Ciudadano del Exceso de Requisitos y Trámites Administrativos, N.º 8220, y a la Ley contra la Corrupción y el Enriquecimiento Ilícito en la Función Pública, N.º 8422.` }
+  ]
+},
+{ t: 'Generalidades del fraccionamiento',
+  arts: [
+  { id: 'tipos-fraccionamiento', t: 'Tipos de fraccionamiento', x: `Los fraccionamientos se deben realizar por medio de alguna de las siguientes modalidades, reguladas en los capítulos siguientes de este reglamento:
+a) Fraccionamiento simple.
+b) Fraccionamiento con fines urbanísticos.
+c) Fraccionamiento para uso residencial, mediante acceso excepcional.
+d) Fraccionamiento con fines agrícolas, pecuarios, forestales o mixtos.
+La modalidad de fraccionamiento admitida en cada zona depende de su estrategia de gestión y de su relación con el cuadrante urbano:
+{{tabla:A03|Estrategia de gestión por zona}}
+{{tabla:C06|Modalidades de fraccionamiento admitidas por zona}}
+[[Precisar aquí, zona por zona, qué modalidades de fraccionamiento se admiten, siguiendo el criterio: el fraccionamiento simple y el acceso excepcional se reservan a {{zonas:cu}}; el fraccionamiento con fines agrícolas, pecuarios, forestales o mixtos se reserva a {{zonas:fuera}}.]]
+Según las características y la ubicación del fraccionamiento, la Municipalidad debe verificar la aplicación de los artículos 10 y 36 de la Ley de Planificación Urbana para emitir el visado respectivo.` },
+  { id: 'permisos-visados', t: 'Permisos de construcción, patentes y visados', x: `No se otorgará el visado del artículo 33 de la Ley de Planificación Urbana a lotes producto de un fraccionamiento o urbanización si las porciones resultantes no cumplen con los requisitos de este reglamento y de las normas generales. En caso de reunión de fincas, la Municipalidad podrá otorgar el respectivo visado.` },
+  { id: 'derecho-via', t: 'Derecho de vía que enfrente la propiedad a fraccionar', x: `Para todo tipo de fraccionamiento, la Municipalidad solicitará a la persona que fracciona las mejoras que considere necesarias sobre la mitad de la calle a la que se enfrenten los lotes resultantes, incluidas su extensión y la habilitación de los servicios públicos indispensables, según el trámite que indique la Municipalidad.
+Todo fraccionamiento debe contemplar, al momento de su construcción, la salida adecuada de las aguas pluviales de los lotes resultantes mediante cordón y caño, conectados al sistema de alcantarillado pluvial cuando exista. Deben construirse además aceras frente a los lotes, conforme a la Ley N.º 7600 de Igualdad de Oportunidades para las Personas con Discapacidad.
+Cuando el predio a fraccionar enfrente una vía ya existente, el número de lotes resultantes y sus accesos deben ajustarse a las condiciones de conectividad de esa vía:
+{{tabla:F09|Fraccionamiento frente a vía existente}}` },
+  { id: 'reunion-predios', t: 'Reunión de predios', x: `La reunión de predios se permite siempre que el lote resultante, así como el resto de la finca fraccionada cuando lo hubiere, cumpla con los parámetros establecidos en el Reglamento de Zonificación y Forma Urbana según su zona.` }
+  ]
+},
+{ t: 'Fraccionamiento simple',
+  arts: [
+  { id: 'fraccionamiento-simple', t: 'Fraccionamientos simples', x: `Los fraccionamientos simples de predios son permitidos siempre que los lotes resultantes cumplan las siguientes condiciones:
+a) Realizar el fraccionamiento dentro de una misma finca madre ubicada en {{zonas:cu}}.
+b) Tener acceso directo a vía pública.
+c) Contar con disponibilidad de los servicios públicos indispensables: agua, electricidad, evacuación pluvial, residuos sólidos, telefonía e internet.
+d) Cumplir con las áreas y frentes mínimos del Reglamento de Zonificación y Forma Urbana.
+e) Fraccionar la finca madre en un máximo de [[8]] lotes, respetando el límite de segregaciones por finca madre de la zona:
+{{tabla:C05|Segregaciones por finca madre}}
+f) Estar al día con los servicios e impuestos municipales.
+g) Estar libre de afectaciones o limitaciones urbanísticas que impidan su aprovechamiento, o que estas puedan conciliarse con el fraccionamiento propuesto.
+h) Estar ubicado en un área sin restricciones físico-ambientales y antrópicas de las definidas en el Reglamento de Zonificación y Forma Urbana.` },
+  { id: 'dimensiones-simple', t: 'Dimensiones mínimas de predios en fraccionamientos simples', x: `En los fraccionamientos simples, el fondo del predio a fraccionar y de los lotes resultantes no debe exceder la relación frente-fondo de su zona. En caso de quedar restos de finca, también deben cumplir dicha relación. El frente y el área mínimos son los establecidos para cada zona en el Reglamento de Zonificación y Forma Urbana:
+{{tabla:C01,C02,C03|Dimensiones mínimas de lote en fraccionamiento simple}}
+Todo lote resultante debe cumplir con el área mínima; si existen afectaciones por alineamientos, esa área no es computable para el cálculo. Cuando el fraccionamiento simple se realice en una urbanización ya aprobada y recibida por la Municipalidad, los lotes resultantes deben cumplir con el área de lote mínimo de los planos aprobados del proyecto.` },
+  { id: 'frente-menor-simple', t: 'Lotes con frente menor a la norma', x: `Se permitirá el fraccionamiento simple de lotes con frente menor al establecido, únicamente dentro de {{zonas:cu}}. En cada finca madre podrá autorizarse un máximo de [[4]] lotes bajo esta condición, siempre que se garantice el aprovechamiento de la infraestructura existente y se cumpla con lo siguiente:
+a) Los lotes exteriores deben tener el frente mínimo establecido para su zona.
+b) Los lotes interiores deben tener un frente a vía pública de entre 3,00 m y 4,00 m.
+c) Los lotes interiores deben tener una franja de acceso, llamada «acceso del predio», de hasta 30,00 m de longitud para 3,00 m de ancho, o hasta 40,00 m para 4,00 m de ancho. Esta franja no es computable para el área mínima del lote ni puede construirse sobre ella, salvo tapias; debe ser uniforme, unidireccional y terminar en ángulo recto.
+d) Tanto los lotes interiores como los exteriores deben cumplir con el área mínima de su zona.
+Lo anterior sin perjuicio de las disposiciones de los entes competentes en materia ambiental.` },
+  { id: 'requisitos-simple', t: 'Requisitos documentales para el visado de fraccionamiento simple', x: `La Municipalidad debe verificar que la finca madre se ubique en una zona autorizada para fraccionamiento simple. Para el visado, el fraccionador debe presentar al menos:
+a) Solicitud de visado debidamente llena.
+b) Disponibilidad de los servicios de agua y electricidad, con el número de plano catastrado y el número de servicios otorgados.
+c) Croquis de segregación georreferenciado, con la minuta de presentación ante catastro.
+d) Constancia de estar al día con los tributos municipales.
+e) Cuando el predio enfrente ruta nacional, los retiros dados por el MOPT.
+f) Plano catastrado certificado de la finca madre, o certificado catastral.
+g) Plano georreferenciado del conjunto de lotes resultantes, firmado por el profesional responsable, con frente, fondo y ancho del derecho de vía.
+h) Los planos individuales de agrimensura de cada lote resultante, georreferenciados y firmados por el profesional responsable.` }
+  ]
+},
+{ t: 'Fraccionamiento con fines urbanísticos',
+  arts: [
+  { id: 'fraccionamiento-urbanistico', t: 'Fraccionamientos con fines urbanísticos', x: `Los fraccionamientos con fines urbanísticos son permitidos siempre que los lotes resultantes cumplan con las siguientes condiciones:
+a) Realizar el fraccionamiento dentro de una misma finca madre ubicada en una zona autorizada.
+b) Cumplir con la cesión de área para uso público regulada en el {{art:cesion-publica-minima}}.
+c) Tener acceso directo a vía pública.
+d) Cumplir con las áreas y frentes mínimos del Reglamento de Zonificación y Forma Urbana.
+e) Contar con disponibilidad de los servicios públicos indispensables: agua, electricidad, evacuación pluvial, residuos sólidos, telefonía e internet.
+f) Estar al día con los servicios e impuestos municipales.
+g) Estar libre de afectaciones o limitaciones urbanísticas que impidan su aprovechamiento, o que estas puedan conciliarse con el fraccionamiento propuesto.
+De no contar con los servicios públicos indispensables, quien fraccione debe costear las obras necesarias fuera de su propiedad para ofrecerlos. Todo fraccionamiento con fines urbanísticos debe proveer la recolección de las aguas pluviales de los lotes para evitar su empozamiento.
+Cuando el fraccionamiento se desarrolle de forma agrupada, debe reservarse el siguiente porcentaje de suelo a conservar según su zona:
+{{tabla:C07|Suelo a conservar en desarrollo agrupado}}` },
+  { id: 'dimensiones-urbanistico', t: 'Dimensiones mínimas de predios en fraccionamientos con fines urbanísticos', x: `El fondo del predio y de los lotes resultantes no debe exceder la relación frente-fondo de la zona. El área y el frente mínimos son los del Reglamento de Zonificación y Forma Urbana según la zona en que se ubique el desarrollo. El predio debe contar con conexión al alcantarillado sanitario o, en su defecto, con tanque séptico u otro sistema de tratamiento conforme a las disposiciones del Ministerio de Salud.
+Si existen afectaciones por alineamientos oficiales, esa superficie no es computable para el área mínima de lote. La densidad bruta resultante del fraccionamiento no debe exceder la de su zona, salvo que se acojan al incentivo de densidad del artículo siguiente:
+{{tabla:C04,C09|Densidad bruta máxima y con incentivos}}` },
+  { id: 'convenios-cuido', t: 'Convenios para el cuido, mantenimiento y atención de áreas públicas', x: `La Municipalidad podrá suscribir convenios con asociaciones de vecinos o personas jurídicas que, por interés directo como beneficiarias, vecinas o usuarias, tengan voluntad de hacerse cargo de la limpieza, el mantenimiento, la vigilancia y la atención de las áreas de cesión pública.` },
+  { id: 'cesion-urbanistico', t: 'Cesión de áreas públicas en fraccionamientos con fines urbanísticos', x: `Todo fraccionamiento con fines urbanísticos debe ceder un porcentaje de área para uso público según {{art:cesion-publica-minima}}, siempre que esa área sea igual o mayor a 90 m² y la suma de los lotes a fraccionar sea de 8 o más, ambas condiciones en conjunto. El área cedida debe destinarse a juegos recreativos, parques y facilidades comunales, en ese orden de prioridad.
+Cuando el área a ceder esté entre 90,00 m² y 250,00 m², la cesión puede darse en el sitio o en otro predio que determine la Municipalidad según sus necesidades. Si el área a ceder es mayor a 250,00 m², la cesión debe darse en el sitio.
+Las áreas cedidas deben traspasarse a favor del dominio municipal y utilizarse según lo indicado para urbanizaciones de uso residencial. La Municipalidad debe llevar el registro de los fraccionamientos y las cesiones de cada finca madre.` },
+  { id: 'requisitos-urbanistico', t: 'Certificado de anteproyecto y requisitos documentales', x: `Para solicitar el certificado de anteproyecto de fraccionamiento con fines urbanísticos deben presentarse, entre otros:
+a) Plano catastrado de la finca madre o certificado catastral.
+b) Certificado de uso de suelo, con el número de planos catastrados, uso, retiros, cobertura, densidad, altura, frente y área mínima aplicables, y su plazo de vigencia.
+c) Cuando el predio esté afectado por dos o más zonas, un croquis que identifique las áreas comprendidas en cada una.
+d) Anteproyecto digital con la finca madre, los lotes propuestos, las áreas públicas por ceder y un cuadro de áreas, frentes mínimos y numeración de cada lote.
+e) Plano georreferenciado del conjunto de lotes y del área a ceder, firmado por el profesional responsable, con frente-fondo, ancho del derecho de vía y mejoras a media calle.
+f) Planos individuales de agrimensura de cada lote y de las áreas públicas a ceder, incluido el equipamiento de juegos recreativos.
+g) Disponibilidad de los servicios de agua y energía.
+La Municipalidad cuenta con un plazo de 15 días hábiles para otorgar el visado; si requiere modificaciones, cuenta con 8 días hábiles adicionales para resolver una vez presentados los documentos.` }
+  ]
+},
+{ t: 'Fraccionamiento para uso residencial',
+  arts: [
+  { id: 'acceso-excepcional', t: 'Acceso excepcional para uso residencial', x: `Cuando un predio, por su relación de frente y fondo, por la irregularidad de su forma o por su pendiente, resulte imposible de dividir en lotes con acceso directo a la vía pública que cumplan con el área mínima de su zona, se puede admitir la excepción del fraccionamiento mediante la apertura de un acceso excepcional para uso residencial, para una única vivienda unifamiliar por cada lote resultante.
+Cualquier autoridad o funcionario de las entidades que prestan servicios públicos puede acceder a los lotes resultantes mediante este acceso, para fines de control municipal, seguridad pública, salud, bomberos y similares. La Municipalidad y otras instituciones públicas no tienen obligación de dar mantenimiento o prestar servicios al acceso ni a los lotes que sirve.` },
+  { id: 'ubicacion-acceso', t: 'Ubicación del acceso excepcional', x: `Los accesos excepcionales para uso residencial se permiten únicamente dentro de una misma finca madre ubicada en una zona autorizada para esta modalidad.` },
+  { id: 'condiciones-acceso', t: 'Condiciones del acceso excepcional para uso residencial', x: `El acceso excepcional no constituye una vía pública, aunque es de uso común para los lotes resultantes. Debe cumplir con:
+a) Un ancho de 6,00 m en todos los casos, dentro de los cuales se debe contemplar cordón y caño y aceras frente a los lotes resultantes, según el Reglamento de Vialidad y Movilidad y la Ley N.º 7600.
+b) Una longitud que no exceda 60,00 m medidos desde la vía pública.
+c) No ser computable para el área mínima de los lotes que sirve.
+d) Frente a este acceso solo se puede fraccionar un máximo de [[6]] lotes, en uno o ambos lados. Los lotes que enfrenten la vía pública no pueden usar el acceso excepcional, salvo que ya estén contabilizados dentro de ese máximo.
+No se permiten dos accesos excepcionales paralelos, contiguos ni continuos, salvo que se demuestre con certeza técnica que resulta imposible ubicarlos en otro lugar, análisis que debe autorizar el INVU junto con la Municipalidad.` },
+  { id: 'dimensiones-acceso', t: 'Dimensiones mínimas de predios en la excepción para uso residencial', x: `El área mínima de los lotes resultantes y sus frentes deben ser los de su zona. Todo lote resultante debe cumplir con el área mínima; si existen afectaciones por alineamientos, esa área no es computable para el cálculo. El área del acceso no es computable para el área mínima del lote, y sobre ella no pueden hacerse construcciones, salvo tapias en línea de propiedad.` },
+  { id: 'requisitos-acceso', t: 'Requisitos documentales para el visado de esta excepción', x: `Debe presentarse, entre otros: solicitud de visado, copia del plano madre, disponibilidad de electricidad y agua potable, constancia de estar al día con los tributos municipales, los retiros dados por el MOPT cuando se enfrente a ruta nacional, la escritura pública del acceso excepcional, el croquis del fraccionamiento y los planos individuales de agrimensura de cada lote, georreferenciados y firmados por el profesional responsable.` },
+  { id: 'redes-acceso', t: 'Localización de redes de servicios en la excepción para uso residencial', x: `Las redes de electricidad, acueductos, alcantarillados, telecomunicaciones u otros sistemas deben ubicarse sobre la vía pública. Quien fraccione debe costear las obras necesarias para la conexión de dichos servicios.` }
+  ]
+},
+{ t: 'Fraccionamiento con fines agrícolas, pecuarios, forestales o mixtos',
+  arts: [
+  { id: 'fraccionamiento-agricola', t: 'Fraccionamiento con fines agrícolas, pecuarios, forestales o mixtos', x: `Los fraccionamientos de parcelas con fines agrícolas, pecuarios, forestales o mixtos tienen acceso a través de una servidumbre agrícola, pecuaria o forestal, y se permiten únicamente dentro de una misma finca madre ubicada en {{zonas:fuera}}.` },
+  { id: 'dimensiones-agricola', t: 'Dimensiones mínimas de parcelas', x: `Las parcelas pueden fraccionarse con fines agrícolas, pecuarios, forestales o mixtos siempre que el área mínima de cada una no sea menor a {{v:C01:T2a}} frente a la servidumbre agrícola, y cumpla con los demás parámetros de su zona en el Reglamento de Zonificación y Forma Urbana.` },
+  { id: 'cobertura-agricola', t: 'Cobertura máxima', x: `El fraccionamiento de predios y parcelas con fines agrícolas, pecuarios, forestales o mixtos debe ajustarse a los parámetros de cobertura de su zona, y su cobertura no podrá ser mayor al [[25 %]].
+De dicha cobertura, hasta un [[10 %]] podrá destinarse, de forma conjunta, a una única vivienda unifamiliar de hasta [[300 m²]], viviendas para trabajadores agrícolas e infraestructura agroturística asociada a la actividad productiva. El porcentaje restante podrá destinarse a infraestructura agropecuaria vinculada a la actividad.
+|# Distribución de la cobertura máxima permitida
+| Porcentaje del área de la parcela | Tipo de edificaciones permitidas
+| 10 % | Una vivienda unifamiliar de hasta 300 m², viviendas de trabajadores agrícolas, infraestructura agroturística
+| 15 % | Bodegas, establos, invernaderos, plantas de tratamiento, estanques, corrales, lecherías, silos, caminos internos y demás infraestructura agropecuaria` },
+  { id: 'accesos-servidumbre', t: 'Accesos por servidumbre a parcelas con fines agrícolas, pecuarios, forestales o mixtos', x: `Estos accesos deben tener conexión directa a la vía pública y un ancho mínimo de [[7,00 m]]. Deben constituirse en los asientos registrales a favor de cada parcela fraccionada y en contra de la finca que genera el fraccionamiento. El material de la capa de rodamiento debe ser permeable. Este acceso no se categoriza como vía pública, por lo que frente a él no puede realizarse ningún otro tipo de fraccionamiento que no sea el de este capítulo.` },
+  { id: 'parcelas-bosque', t: 'Parcelas con cobertura boscosa', x: `Para el fraccionamiento de parcelas con cobertura boscosa, el área mínima debe ser de [[20 000 m²]], de conformidad con la Ley Forestal N.º 7575; para estos casos no aplica el área mínima de la zona que las contenga. La cobertura boscosa existente debe protegerse tanto en los frentes a calle pública como al interior de las parcelas. La Administración Forestal del Estado puede autorizar la intervención del bosque hasta en un [[10 %]] de su área total, de forma gradual.` },
+  { id: 'excepcion-cesion', t: 'Excepción de cesión de área pública', x: `Cuando el fraccionamiento se realice en parcelas con fines agrícolas, pecuarios, forestales o mixtos, no se exige la cesión de área pública.` },
+  { id: 'requisitos-agricola', t: 'Requisitos documentales para el visado', x: `Debe presentarse, entre otros: solicitud de parcelamiento, constancia de estar al día con los tributos, plano catastrado certificado o certificado catastral, certificado de uso de suelo, el estudio de suelos y capacidad de uso de las tierras aprobado por el INTA, el plano georreferenciado del conjunto de parcelas y de los accesos por servidumbre, y los planos individuales de agrimensura de cada parcela resultante.` }
+  ]
+},
+{ t: 'Generalidades de las urbanizaciones',
+  arts: [
+  { id: 'condiciones-urbanizar', t: 'Condiciones para urbanizar predios', x: `El desarrollo de urbanizaciones es permitido siempre que el predio a urbanizar:
+a) Tenga acceso directo a vía pública.
+b) Cuente con sistema de abastecimiento de agua potable, sistema de tratamiento de aguas residuales, sistema de alcantarillado pluvial, disponibilidad de servicio eléctrico y red de telecomunicaciones. De no contar con ellos, quien urbanice debe costear las obras necesarias fuera de su propiedad.
+c) Esté libre de afectaciones o limitaciones urbanísticas que impidan su aprovechamiento, o que estas puedan conciliarse con la urbanización propuesta.
+Cuando en la colindancia exista una urbanización ya construida, debe darse continuidad a la infraestructura vial mediante su integración física y funcional. El profesional responsable debe considerar en el diseño las condiciones naturales del predio y de sus inmediaciones.` },
+  { id: 'agua-potable-urb', t: 'Sistema de abastecimiento de agua potable', x: `Toda urbanización debe contar con un sistema de abastecimiento de agua potable que garantice la disponibilidad del servicio para todos los lotes resultantes. La disponibilidad debe ser otorgada por el AyA, una ASADA u otro operador, conforme al artículo 117 del Reglamento de Construcciones del INVU.
+{{tabla:G01|Agua potable por zona}}
+Cuando se requiera aumentar el número de lotes o unidades habitacionales de una urbanización o conjunto residencial ya aprobado, también debe contarse con la disponibilidad de agua para los lotes adicionales.` },
+  { id: 'tratamiento-aguas-residuales', t: 'Sistema de tratamiento de aguas residuales', x: `En todo proyecto de urbanización, las aguas residuales deben conducirse hacia un alcantarillado sanitario, tanque séptico o sistema de tratamiento equivalente, que garantice la capacidad de depuración. Debe contarse con un documento que certifique la disponibilidad de este servicio.
+{{tabla:G02|Saneamiento por zona}}
+De no contarse con alcantarillado sanitario, debe construirse hacia una planta de tratamiento (con permiso de ubicación del MINSA) o un tanque séptico o similar (con pruebas de infiltración del suelo).` },
+  { id: 'pruebas-infiltracion', t: 'Pruebas de infiltración', x: `Toda urbanización que no cuente con alcantarillado sanitario debe realizar pruebas de infiltración para evaluar la permeabilidad del suelo, conforme al reglamento nacional de aprobación de sistemas de tratamiento de aguas residuales. En caso de alteración sustancial de las condiciones naturales del predio, se requiere una nueva prueba para los niveles finales.` },
+  { id: 'alcantarillado-pluvial', t: 'Sistema de alcantarillado pluvial', x: `Las aguas pluviales de todo proyecto de urbanización deben conducirse hacia un sistema de alcantarillado pluvial que garantice el vertido de las aguas de lluvia hacia lugares naturales de disposición, conforme a la normativa técnica del AyA.
+{{tabla:G03|Aguas pluviales por zona}}
+Para la descarga final debe contarse con autorización de desfogue de la Municipalidad, y las obras de infraestructura deben entregarse al gobierno municipal.` },
+  { id: 'terrenos-pendiente', t: 'Terrenos con pendiente y movimiento de tierras', x: `Cuando el terreno donde se desarrolla la urbanización tenga pendiente, deben determinarse las condiciones del movimiento de tierra en cortes, rellenos y taludes:
+a) Pendientes mayores al [[15 %]]: debe presentarse un estudio preliminar de suelos y terraceo.
+b) Pendientes mayores al [[30 %]]: debe presentarse un estudio de estabilidad del terreno.
+Las hileras de lotes y las vías deben colocarse preferiblemente paralelas a las curvas de nivel. La capa vegetal removida debe reutilizarse en el tratamiento final de las áreas, y no deben dejarse escombros en las áreas destinadas a futuras construcciones ni en las zonas públicas.` },
+  { id: 'lotificacion-urb', t: 'Lotificación', x: `Los lotes resultantes de una urbanización deben cumplir con lo siguiente:
+a) Las áreas y frentes mínimos de su zona, y la relación frente-fondo correspondiente.
+b) Linderos laterales preferiblemente a 90° respecto a la línea de cordón y caño.
+c) Quedar completamente libres de cualquier afectación.
+d) En lotes esquineros, el frente menor permitido debe ser el mínimo de la zona más el retiro frontal.
+{{tabla:C01,C02,C03|Lotificación en urbanizaciones}}
+Las dimensiones de las manzanas resultantes deben ajustarse al tamaño máximo de manzana de la zona:
+{{tabla:F05|Tamaño máximo de manzana}}` },
+  { id: 'areas-proteccion-forestal', t: 'Áreas de protección forestal y de nacientes de agua', x: `En predios que contengan o colinden con áreas protegidas, es obligatorio solicitar el alineamiento respectivo ante el INVU, conforme a la Ley Forestal N.º 7575. Cuando el predio colinde con una naciente de agua, debe tramitarse el Dictamen de Cuerpo de Agua ante la Dirección de Aguas del MINAE.
+El área de protección forestal y de nacientes no se computa dentro del área urbanizable ni en el porcentaje de uso público; en ella no pueden realizarse movimientos de tierra que alteren la topografía natural.
+Todo desarrollo sujeto a estudio de impacto ambiental debe además presentar, para su aprobación municipal, un plan de protección del arbolado existente y un plan de arborización:
+{{tabla:I05|Planes de protección y de arborización en desarrollos}}` },
+  { id: 'localizacion-redes-urb', t: 'Localización de redes de servicios', x: `Las redes de electricidad, acueductos, alcantarillados, telecomunicaciones u otros sistemas deben ubicarse preferiblemente en los derechos de vía o sobre áreas de uso público. Únicamente la servidumbre de uso pluvial puede localizarse en áreas de parque y de juegos infantiles.
+{{tabla:G04|Energía y telecomunicaciones}}
+Toda urbanización debe garantizar además la recolección y el manejo adecuado de los residuos sólidos:
+{{tabla:G05|Residuos sólidos}}` },
+  { id: 'parametros-urb-residencial', t: 'Parámetros urbanísticos en urbanizaciones de uso residencial', x: `El fondo de los lotes resultantes de una urbanización no debe exceder la relación frente-fondo de su zona. El área, el frente mínimo y los parámetros de edificación de los lotes y las edificaciones deben coincidir con los establecidos para cada zona en el Reglamento de Zonificación y Forma Urbana. Si existen afectaciones por alineamientos, esa área no es computable para el área mínima.` }
+  ]
+},
+{ t: 'Cesión de área pública',
+  arts: [
+  { id: 'cesion-publica-minima', t: 'Cesión de área pública para juegos recreativos, parques y facilidades comunales', x: `Todo fraccionamiento con fines urbanísticos y toda urbanización debe ceder gratuitamente, a favor del dominio municipal, el siguiente porcentaje de área para uso público según la zona:
+{{tabla:C08|Cesión de áreas públicas por zona}}
+La cesión podrá realizarse, previa autorización municipal y con fundamento en criterios técnicos, en áreas prioritarias del territorio cantonal donde se identifique mayor carencia de espacios públicos, siempre que se garantice un beneficio equivalente o superior para la comunidad.` },
+  { id: 'cesion-vias', t: 'Cesión de área pública destinada a vías', x: `Toda urbanización debe ceder y traspasar al uso público las vías de la urbanización, que deben cumplir con la clasificación de vías del Reglamento de Vialidad y Movilidad.` },
+  { id: 'distribucion-area-publica', t: 'Distribución del área pública en urbanizaciones de uso residencial', x: `El área cedida para uso público debe destinarse a juegos recreativos, parques y facilidades comunales, en este orden de prioridad, y distribuirse así:
+a) Juegos recreativos: [[10 m²]] por lote o unidad habitacional.
+b) Parque: un tercio del área pública restante, una vez descontada el área de juegos recreativos.
+c) Facilidades comunales: las dos terceras partes restantes.
+Cuando el área a ceder sea menor que el área mínima de lote, debe destinarse prioritariamente a juegos recreativos y parques.` },
+  { id: 'disposiciones-lotes-publicos', t: 'Disposiciones generales para lotes destinados a área pública', x: `Los lotes donde se ubiquen las áreas públicas deben estar contiguos a áreas ya establecidas para ese uso, o en la periferia si las propiedades colindantes no se han desarrollado; deben distribuirse equidistantes de las viviendas y tener un frente mínimo de [[10,00 m]]. Las áreas de juegos recreativos y facilidades comunales deben contar con agua potable y electricidad, y su topografía no debe superar el promedio del predio a urbanizar.` },
+  { id: 'juegos-recreativos', t: 'Juegos recreativos', x: `Además de lo indicado en el artículo anterior, las áreas de juegos recreativos deben:
+a) Ubicarse a no más de [[300,00 m]] de la vivienda más alejada, medidos sobre calles.
+b) No formar ángulos agudos ni tener zonas de difícil vigilancia.
+c) Proveer aceras, cerramiento con seto o malla de al menos 1 m de altura, y bebederos de agua potable.
+d) Estar enzacatadas y arborizadas.
+e) Incluir un núcleo de juegos por cada [[50]] unidades habitacionales o lotes, con equipamiento para cada grupo etario: infancia, adolescencia, adultez y adulta mayor.
+f) Proveer un área de resguardo mínima de [[6,00 m²]] por cada 500 m².` },
+  { id: 'parques-facilidades', t: 'Parques y facilidades comunales', x: `Las áreas de parque deben ubicarse preferiblemente en un mismo lote, enzacatadas y arborizadas. Las áreas de facilidades comunales pueden destinarse a educación, salud, deporte, servicios públicos, centros comunales, bibliotecas y guarderías, según la densidad de población; su ubicación debe tener una topografía no mayor al promedio del terreno urbanizable.` },
+  { id: 'obligaciones-cesion', t: 'Obligaciones del urbanizador en la cesión de áreas públicas', x: `Quien urbanice debe entregar el área de juegos recreativos con el equipamiento necesario, y tanto esta como el área de parque deben entregarse enzacatadas y arborizadas, según {{art:parques-facilidades}}. Los planos constructivos deben incluir una lámina completa con las obras y el equipamiento a instalar.` }
+  ]
+},
+{ t: 'Sistema vial de las urbanizaciones',
+  arts: [
+  { id: 'aceras-urb', t: 'Aceras y franjas verdes en urbanizaciones', x: `La construcción de aceras debe cumplir con el Reglamento de Vialidad y Movilidad y con la Ley N.º 7600 de Igualdad de Oportunidades para las Personas con Discapacidad. Las franjas verdes deben cumplir con lo establecido en el Reglamento de Espacio Público y Paisaje.` },
+  { id: 'ochavos', t: 'Ochavos en predios esquineros', x: `En las propiedades esquineras de una urbanización deben recortarse las esquinas en el límite de propiedad mediante un ochavo de [[2,50 m]] a cada lado. El radio de la curva será el establecido en el Reglamento de Vialidad y Movilidad.` },
+  { id: 'clasificacion-vias-urb', t: 'Clasificación y diseño de las vías', x: `Las vías de una urbanización se clasifican y diseñan de acuerdo con las disposiciones del Reglamento de Vialidad y Movilidad de este Plan Regulador.` }
+  ]
+},
+{ t: 'Trámites de anteproyectos para urbanizaciones y conjuntos residenciales',
+  arts: [
+  { id: 'tramite-anteproyecto', t: 'Trámite de anteproyecto', x: `El trámite de revisión de anteproyectos para urbanizaciones y conjuntos residenciales se realiza a través de las plataformas digitales de tramitación del CFIA. En todo proyecto que se desarrolle por etapas, el trámite de anteproyecto ante el INVU es obligatorio; en caso contrario, es optativo.` },
+  { id: 'requisitos-anteproyecto', t: 'Requisitos documentales para el visado de anteproyectos', x: `Para autorizar el visado de anteproyectos debe presentarse al INVU, entre otros:
+a) Certificación literal de la propiedad o autorización del propietario.
+b) Plano catastrado del predio, con el amarre vial a la vía existente.
+c) Certificado de uso de suelo, con el número de planos catastrados, uso, retiros, cobertura, densidad, altura, frente y área mínima.
+d) El alineamiento vial según el tipo de vía que enfrente el predio: vías nacionales (MOPT) o vías cantonales (Municipalidad).
+e) La lámina de diseño de sitio del anteproyecto.
+Cuando corresponda, deben presentarse además los alineamientos de áreas de protección forestal, de nacientes de agua, de pozos, de torres eólicas, de vías férreas, de oleoductos, de colectores sanitarios o el dictamen de proximidad a aeropuertos.` },
+  { id: 'diseno-sitio-anteproyecto', t: 'Diseño de sitio de anteproyectos', x: `La lámina de diseño de sitio debe contener, como mínimo: escala y orientación; el polígono del plano catastrado con sus colindantes; la topografía con curvas de nivel; el diseño geométrico acotado de los derechos de vía, calzadas, aceras y franjas verdes; la lotificación con el tamaño y la forma de las manzanas; la ubicación de las áreas públicas; la disposición final de las aguas residuales; y una tabla de áreas (total, urbanizable, no urbanizable, pública, derechos de vía, lotes vendibles por uso, área mínima y promedio de lote, y número de lotes).` }
+  ]
+},
+{ t: 'Proyectos especiales para renovación urbana',
+  arts: [
+  { id: 'variacion-norma', t: 'Variación de la norma', x: `La variación de la norma consiste en aceptar, para proyectos de urbanización y conjuntos residenciales, dimensiones mínimas diferentes a las de este reglamento en derechos de vía, áreas y frentes de lote. El INVU y la Municipalidad deben evaluar cada variación conforme a los principios de oportunidad y conveniencia, debidamente justificada en el anteproyecto, de acuerdo con el Reglamento de Renovación Urbana e Instrumentos de Gestión del Suelo.` },
+  { id: 'causas-variacion', t: 'Causas para la variación de la norma', x: `Pueden aceptarse variaciones cuando la causa sea la atención de asentamientos informales o asentamientos irregulares o con estructuras inhabitables, definidos como polígonos de renovación en el Reglamento de Renovación Urbana.` }
+  ]
+},
+{ t: 'Plano general de urbanización o conjuntos residenciales',
+  arts: [
+  { id: 'contenido-plano-general', t: 'Contenido del plano general de agrimensura', x: `El plano general de agrimensura debe estar georreferenciado al sistema oficial de coordenadas vigente y contar con la firma del profesional responsable. Debe contener el diseño general de la urbanización o del conjunto residencial, incluyendo área y ubicación de los lotes, zonas comerciales, calles, juegos recreativos, facilidades comunales, parque y áreas de protección forestal, con su tabla de áreas y secciones típicas de calles.` },
+  { id: 'tramite-visado-plano-general', t: 'Trámite de visado del plano general', x: `Posterior al permiso de construcción de las obras, debe tramitarse el visado del plano general: la Municipalidad verifica que el proyecto se construyó según los planos aprobados, realiza la inspección correspondiente y el Concejo Municipal autoriza la recepción de las obras mediante acuerdo municipal. Con el visado municipal, el profesional responsable gestiona el visado ante el INVU, que realiza su propia inspección. Con ambos visados, el plano general se transforma en Mapa Oficial, y el profesional responsable tramita ante el Registro Inmobiliario la segregación de los lotes y áreas públicas.` },
+  { id: 'garantias-cumplimiento', t: 'Garantías de cumplimiento de obra faltante', x: `Excepcionalmente, cuando la Municipalidad esté anuente a autorizar la segregación de lotes sin que se hayan concluido las obras, estas deben presentar un avance de al menos el [[90 %]]. Para el [[10 %]] faltante debe exigirse garantía de cumplimiento (garantía bancaria, póliza o fianza, certificado de depósito a plazo, o fideicomiso de garantía), que se hace efectiva si transcurridos 5 años desde la aprobación de los planos constructivos las obras no se han ejecutado.` },
+  { id: 'venta-lotes', t: 'Venta de lotes y fraccionamiento posterior', x: `La venta de lotes de una urbanización o conjunto residencial solo es permitida si se ejecutaron las obras de urbanización, o si se rindió la garantía de cumplimiento del artículo anterior. Para fraccionar lotes dentro de una urbanización ya constituida, debe garantizarse que la nueva segregación cumpla con los parámetros de densidad del Reglamento de Zonificación y Forma Urbana.` }
+  ]
+}
+]
+};
+
+/* 03 Mapa Oficial: adaptado del Reglamento de Mapa Oficial del Plan Regulador de Liberia.
+   Este reglamento es, sobre todo, un inventario cartográfico propio de cada cantón: las grandes tablas
+   de bienes públicos, vialidad y zonas de interés municipal de Liberia no se copiaron (son de ese cantón),
+   y quedan como [[ ]] para que cada municipalidad incorpore su propio inventario como anexo. */
+window.REG_BASE['03'] = {
+id: '03',
+t: 'Reglamento de Mapa Oficial',
+fuente: 'Borrador adaptado del Reglamento de Mapa Oficial del Plan Regulador de Liberia. Las tablas de inventario (bienes públicos, vialidad, zonas de interés municipal) son propias de cada cantón y deben incorporarse como anexo.',
+caps: [
+{ t: 'Disposiciones generales',
+  x: `Que el Mapa Oficial es la representación cartográfica del conjunto de planos que indica con claridad los trazados de vías públicas y las áreas de reserva para usos y servicios comunales, que se rigen por el régimen jurídico aplicable conforme a la Ley de Planificación Urbana N.º 4240 y demás normativa vigente en materia de dominio público.
+Que, de conformidad con el artículo 44 de la Ley N.º 4240, los bienes públicos no requieren inscripción registral para consolidar su condición de tales, bastando su identificación en el Mapa Oficial, sin perjuicio de que puedan inscribirse en el Registro Público dejando constancia de su destino público y del acuerdo municipal que aprueba la cesión.
+Que, conforme al párrafo segundo de ese mismo artículo, el Mapa Oficial adquiere carácter normativo una vez aprobado por la autoridad competente, constituyéndose en el instrumento técnico-legal que regula el uso del suelo en el ámbito territorial correspondiente.
+Que los bienes de dominio público quedan afectados a un destino público específico, por lo que cualquier acto que implique su disposición, desafectación o cambio de destino solo puede realizarse mediante una norma legal expresa que así lo autorice.`,
+  arts: [
+  { id: 'finalidad-bienes', t: 'Finalidad de los bienes públicos', x: `Los bienes indicados en el Mapa Oficial, como las vías públicas y las áreas de reserva para usos y servicios comunales, son bienes de dominio público. Su condición demanial no depende de su inscripción en el Registro Público; cuando proceda inscribirlos conforme al artículo 44 de la Ley N.º 4240, debe dejarse constancia expresa de su destino público y del acuerdo municipal que aprueba la cesión. Los parques, jardines, paseos y demás espacios públicos del artículo 16 de la Ley N.º 4240 son de libre acceso para la población y deben conservarse conforme a su destino.` },
+  { id: 'naturaleza-mapa', t: 'Naturaleza del Mapa Oficial como registro público', x: `El Mapa Oficial del cantón de {{canton}} constituye el registro técnico, cartográfico y jurídico de los bienes de dominio público y de las áreas afectadas a uso público, integrado al sistema de catastro municipal. Su contenido tiene carácter fehaciente para efectos administrativos y sirve de base para la gestión territorial, sin perjuicio de su eventual inscripción en el Registro Nacional.` },
+  { id: 'cesion-terrenos-mapa', t: 'Cesión de terrenos', x: `Se incorporan al Mapa Oficial los terrenos que, conforme a la normativa vigente, deban ser obligatoriamente cedidos por fraccionadores y urbanizadores, según lo establecido en el Reglamento de Fraccionamiento y Urbanizaciones; estos terrenos se entregan formalmente al uso público y se integran al dominio público municipal. Las áreas verdes de uso público son inalienables, imprescriptibles e inembargables, conforme al artículo 40 de la Ley de Planificación Urbana.` },
+  { id: 'incorporacion-planos', t: 'Incorporación de planos al Mapa Oficial', x: `El Mapa Oficial se integra con los planos debidamente aprobados por la autoridad competente en los que se definan alineamientos, afectaciones, vías, áreas públicas u otros elementos de interés urbanístico. La incorporación se realiza una vez otorgado el visado o permiso correspondiente y aprobado, cuando proceda, el acto administrativo que dispone la cesión. El destino de las áreas cedidas será el que conste en el documento inscribible aprobado por la Municipalidad y no podrá variarse salvo mediante los procedimientos legales establecidos.
+El Mapa Oficial debe integrarse y mantenerse actualizado en el Sistema de Información Geográfica Municipal y en el Sistema de Catastro Municipal.` }
+  ]
+},
+{ t: 'Disposiciones particulares',
+  arts: [
+  { id: 'contenido-mapa', t: 'Contenido del Mapa Oficial', x: `En el Mapa Oficial se identifican los equipamientos, dotaciones y espacios recreativos públicos del cantón: cementerios, edificios institucionales, mercados, paradas municipales, centros de cuido en propiedad municipal, salones comunales, edificios históricos de uso público, estadios, parques y plazas. La omisión de algún elemento o su incorrecta ubicación en el mapa no implica la falta de titularidad pública de ese elemento; es potestad de la Municipalidad incorporarlo o corregirlo.
+El nivel de equipamiento exigido por tipo de asentamiento es el siguiente:
+{{tabla:I02|Equipamientos exigidos por zona}}` },
+  { id: 'terrenos-municipales', t: 'Terrenos municipales', x: `Los terrenos municipales se agrupan en las siguientes clasificaciones de suelo: áreas de vialidad (ampliaciones y vía pública); parques (infantiles, municipales, áreas verdes); plazas y canchas; y terrenos municipales baldíos o con infraestructura.` },
+  { id: 'inventario-bienes', t: 'Inventario de bienes públicos', x: `El inventario de bienes públicos se define conforme a los registros del catastro municipal y se utiliza como insumo para la gestión del espacio público.
+[[Incorporar aquí, como anexo, la tabla de inventario de bienes públicos del cantón: ubicación, distrito, folio real, número de plano, condición registral, uso actual, área y categoría de cada predio municipal.]]` },
+  { id: 'vialidad-mapa', t: 'Vialidad en el Mapa Oficial', x: `El Mapa Oficial incorpora el inventario vial del cantón, clasificado conforme al tipo de vía, el derecho de vía y el control de accesos establecidos en el Reglamento de Vialidad y Movilidad:
+{{tabla:F01,F02,F04|Tipo de vía, derecho de vía y control de accesos}}
+[[Incorporar aquí, como anexo, la tabla de inventario vial del cantón con el nombre, la clasificación y la longitud de cada vía.]]` },
+  { id: 'zim', t: 'Zonas de interés municipal (ZIM)', x: `La Municipalidad dispone, dentro del Mapa Oficial, de los inmuebles cuyo uso y gestión resultan estratégicos para el desarrollo del cantón, conforme al artículo 42 de la Ley de Planificación Urbana sobre zonas de reserva. Estas propiedades se clasifican en dos grupos:
+a) Propiedades de conservación y protección (ZIM-A): terrenos de valor ambiental, ecológico, paisajístico o patrimonial, vinculados con las zonas de renovación urbana por causa medioambiental del Reglamento de Renovación Urbana, y cuyo tratamiento corresponde al instrumento de transferencia de potencial edificable de ese reglamento.
+b) Propiedades destinadas a la dotación de infraestructura (ZIM-I): áreas prioritarias para equipamientos, espacios públicos, vialidad u otra infraestructura, en zonas donde exista déficit.
+El propósito de esta identificación es facilitar a la Municipalidad el acceso a estas propiedades mediante los instrumentos urbanísticos de los reglamentos de Zonificación y de Renovación Urbana.
+[[Incorporar aquí, como anexo, el listado de zonas de interés municipal del cantón (ZIM-A y ZIM-I), con nombre, área y categoría de cada una.]]` },
+  { id: 'areas-vialidad-propuesta', t: 'Áreas destinadas a vialidad propuesta', x: `Las áreas destinadas a vialidad propuesta para mejorar el tejido urbano se definen en el mapa de vialidad propuesta del Reglamento de Vialidad y Movilidad.` }
+  ]
+},
+{ t: 'Interpretaciones del mapa',
+  arts: [
+  { id: 'simbologia', t: 'Simbología del mapa', x: `La simbología del Mapa Oficial facilita la correcta interpretación de los elementos territoriales representados y debe utilizarse como referencia obligatoria para toda consulta, aplicación o análisis del plan regulador. Distingue, mediante colores, líneas y tramas:
+a) Vialidad nacional: líneas continuas de trazo medio.
+b) Vialidad cantonal: líneas continuas de trazo fino.
+c) Límites del plan regulador: líneas de trazo grueso que representan el cantón y sus distritos.
+d) Zonas de interés municipal: rellenos sólidos diferenciados según su función (ZIM-A y ZIM-I).
+e) Terrenos municipales: polígonos sólidos según su tipología.` },
+  { id: 'tabla-datos', t: 'Tabla de datos', x: `Las tablas de datos que acompañan el Mapa Oficial constituyen un insumo técnico complementario de carácter normativo para la identificación de las propiedades dentro del ámbito territorial del cantón. Se incorporan como anexos del Mapa Oficial la tabla de inventario vial y la tabla de terrenos municipales, con el mismo carácter normativo para efectos de identificación, clasificación y gestión del suelo.` },
+  { id: 'escalas', t: 'Escalas', x: `El Mapa Oficial utiliza las escalas cartográficas que correspondan según el nivel de detalle requerido y el tipo de análisis territorial a desarrollar.` }
+  ]
+},
+{ t: 'Actualizaciones y modificaciones al mapa',
+  arts: [
+  { id: 'actualizacion-mapa', t: 'Actualización del mapa', x: `La cartografía de este reglamento podrá actualizarse cuando exista justificación técnica, de acuerdo con los siguientes criterios:
+a) Cambios geográficos: alteraciones relevantes como desplazamientos de cuerpos de agua, modificaciones de fronteras o movimientos sísmicos.
+b) Cambios en infraestructura: construcción, eliminación o modificación de carreteras, puentes, edificios e instalaciones públicas.
+c) Actualización de datos demográficos y sociales: cambios en la población, el uso del suelo o la distribución geográfica de actividades.
+d) Avances tecnológicos y científicos: imágenes satelitales, nuevas metodologías geodésicas u otras tecnologías que generen datos más precisos del terreno.
+El Mapa Oficial puede ser actualizado por la Municipalidad según se incorporen nuevos planos de los terrenos correspondientes.` }
+  ]
+}
+]
+};
