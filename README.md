@@ -6,6 +6,9 @@ No necesita servidor ni base de datos: todo corre en el navegador y los escenari
 ## Contenido
 
 - `public/index.html` — la herramienta.
+- `public/etapas/etapas.js` — **pestaña 1, Etapas del PR**: el proceso completo del plan regulador.
+- `public/etapas/etapas.css` — estilos de esa pestaña.
+- `scripts/probar_etapas.mjs` — pruebas de la pestaña de etapas en un navegador simulado (necesita `npm install jsdom`).
 - `public/reglamentos/textos.js` — **texto base de los reglamentos** (aquí se cargan los borradores).
 - `public/reglamentos/motor.js` — conecta el texto con las perillas, el editor y la descarga en Word.
 - `public/reglamentos/reglamentos.css` — estilos de la pestaña Reglamentos.
@@ -49,7 +52,34 @@ Para que solo el equipo o la municipalidad la vean: Cloudflare **Zero Trust → 
 
 En el proyecto de Cloudflare: **Settings → Domains & Routes → Add custom domain** (por ejemplo `calibrador.tudominio.com`).
 
-## Reglamentos (pestaña 7)
+## Etapas del Plan Regulador (pestaña 1)
+
+El recorrido completo, de la preparación preliminar a la publicación en La Gaceta: las 9 etapas
+del MAPRIOT 2025 más el seguimiento, con sus productos, sus 15 entregables formales (que sirven
+de hitos de pago) y el índice maestro de mapas.
+
+**La estructura no está escrita en este repositorio.** Se lee de
+`https://planoexactocr.com/data/estructura_pr.json`, el mismo archivo que lee
+atlas.planoexactocr.com. La razón: si cada herramienta guardara su propia lista de etapas y su
+propia numeración de mapas, se desincronizarían, y el expediente que llega al INVU no cuadraría
+consigo mismo. Un solo archivo, dos lectores. Se genera con
+`scripts/construir_estructura_pr.py` del repositorio `planoexactocr`, a partir del desglose de
+entregables (Ley 4240, MAPRIOT 2025 del INVU y DE 44710-MINAE).
+
+Cada producto y cada mapa declara **quién lo resuelve**:
+
+- `acá` — lo hace el calibrador (zonificación, escenarios, demanda de suelo, capacidad de carga, reglamentos).
+- `atlas` — la lámina la arma el atlas (mapa base y los cuatro componentes del IFA).
+- `equipo consultor` — a mano: campo, laboratorio, trámite.
+
+La etapa 3 (variable ambiental) además trae la **Matriz C** de compatibilidad zona × clase IFA y
+la **Matriz D** de condicionante → norma → reglamento, que son las Fases II y III del EsIVA y le
+tocan a esta herramienta.
+
+El avance marcado se guarda en el navegador y es **del plan, no de un escenario**: cambiar de
+escenario calibrado no mueve la lista de pendientes.
+
+## Reglamentos (pestaña 8)
 
 Cada reglamento del plan (00 Generalidades a 09 Audiencia Pública) tiene un borrador cuyo texto está **conectado a las perillas**: al calibrar, los artículos y tablas se actualizan solos.
 

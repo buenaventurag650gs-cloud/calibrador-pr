@@ -1,0 +1,166 @@
+/* Etapas del Plan Regulador — pestaña del proceso completo.
+   Reutiliza las variables de color de index.html (--surface, --line, --muted, --accent…)
+   para que la pestaña no se vea pegada de otra herramienta. */
+
+#v-etapas { display: none; }
+#v-etapas.show { display: block; }
+
+.et-cab { margin-bottom: 14px; }
+.et-cab h2 { margin: 0 0 6px; }
+.et-cab .et-pie { margin: 12px 0 0; }
+
+/* ---------- resumen de avance ---------- */
+.et-resumen {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px; margin-top: 12px;
+}
+.et-kpi {
+  background: var(--bg); border: 1px solid var(--line); border-radius: 10px;
+  padding: 10px 12px; display: flex; flex-direction: column; gap: 2px;
+}
+.et-kpi b { font-size: 21px; line-height: 1.1; font-weight: 800; }
+.et-kpi span { font-size: 11.5px; color: var(--muted); }
+.et-kpi.chips { flex-direction: row; align-items: center; flex-wrap: wrap; gap: 6px; }
+
+.et-prog {
+  height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; margin-top: 6px;
+}
+.et-prog span { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+
+/* ---------- quién lo resuelve ---------- */
+.et-quien {
+  display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .03em; padding: 2px 7px; border-radius: 20px; white-space: nowrap;
+}
+.et-quien.calibrador { background: #1f6feb22; color: #4d8ef7; }
+.et-quien.atlas { background: #2ea04322; color: #2ea043; }
+.et-quien.equipo { background: #8b949e22; color: var(--muted); }
+
+/* ---------- tarjeta por etapa ---------- */
+.et-card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+  margin-bottom: 9px; overflow: hidden;
+}
+.et-card.abierta { border-color: var(--accent); }
+.et-card.plano { padding: 14px 16px; }
+.et-card.plano.aviso { border-left: 3px solid #d29922; }
+.et-solo { font-size: 14px; margin: 0 0 4px; }
+
+.et-head {
+  display: flex; align-items: center; gap: 12px; padding: 11px 14px; cursor: pointer;
+  user-select: none;
+}
+.et-head:hover { background: var(--bg); }
+.et-head:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.et-num {
+  flex: 0 0 auto; width: 26px; height: 26px; border-radius: 7px; background: var(--bg);
+  border: 1px solid var(--line); display: grid; place-items: center;
+  font-weight: 800; font-size: 13px;
+}
+.et-card.abierta .et-num { background: var(--accent); color: #fff; border-color: var(--accent); }
+.et-tit { flex: 1 1 auto; min-width: 0; }
+.et-tit h3 { margin: 0; font-size: 14px; font-weight: 700; }
+.et-tit p { margin: 1px 0 0; font-size: 11.5px; color: var(--muted); }
+.et-bloque {
+  flex: 0 0 auto; font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .04em; padding: 3px 8px; border-radius: 20px; background: var(--bg);
+  color: var(--muted); border: 1px solid var(--line);
+}
+.et-bloque.elaboracion { color: #4d8ef7; border-color: #1f6feb55; }
+.et-bloque.tramite { color: #d29922; border-color: #d2992255; }
+.et-bloque.adopcion { color: #2ea043; border-color: #2ea04355; }
+.et-avance { flex: 0 0 76px; text-align: right; }
+.et-avance > span { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.et-cuerpo { padding: 0 14px 14px; border-top: 1px solid var(--line); }
+.et-cierra { font-size: 12.5px; margin: 11px 0; }
+.et-sub {
+  font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted);
+  font-weight: 700; margin: 16px 0 6px; display: flex; align-items: center; gap: 8px;
+}
+.et-toggle {
+  width: auto; margin: 0; padding: 2px 9px; font-size: 10.5px; text-transform: none;
+  letter-spacing: 0; border: 1px solid var(--line); border-radius: 20px;
+  background: var(--bg); color: var(--muted); cursor: pointer;
+}
+.et-toggle:hover { color: var(--ink); border-color: var(--accent); }
+.et-nota { font-size: 11.5px; color: var(--muted); margin: 8px 0 0; max-width: 80ch; }
+
+/* ---------- tablas ---------- */
+.et-tabla {
+  width: 100%; border-collapse: collapse; font-size: 12px; background: var(--bg);
+  border: 1px solid var(--line); border-radius: 8px; overflow: hidden;
+}
+.et-tabla th {
+  text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: .04em;
+  color: var(--muted); padding: 7px 10px; border-bottom: 1px solid var(--line);
+  background: var(--surface); font-weight: 700;
+}
+.et-tabla td { padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.et-tabla tr:last-child td { border-bottom: none; }
+.et-tabla tr.hecho td { opacity: .55; }
+.et-tabla tr.hecho .et-act { text-decoration: line-through; }
+.et-check { width: 30px; }
+.et-check input { width: 15px; height: 15px; cursor: pointer; accent-color: var(--accent); }
+.et-cod {
+  width: 58px; color: var(--accent); font-weight: 700; white-space: nowrap;
+  font-variant-numeric: tabular-nums; font-size: 11.5px;
+}
+.et-cod label { cursor: pointer; }
+.et-act { font-weight: 600; }
+.et-ent { font-size: 11px; color: var(--ink); opacity: .8; margin-top: 2px; }
+.et-con { font-size: 10.5px; color: var(--muted); margin-top: 3px; max-width: 72ch; }
+.et-dep { font-size: 10.5px; color: var(--muted); margin-top: 3px; }
+.et-obs { font-size: 10.5px; color: var(--muted); font-style: italic; margin-top: 2px; }
+.et-resp { width: 150px; font-size: 11px; color: var(--muted); line-height: 1.5; }
+.et-norma { font-size: 10px; opacity: .85; }
+.et-pago {
+  font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px;
+  background: #2ea04322; color: #2ea043; margin-left: 6px; white-space: nowrap;
+}
+.et-link { font-size: 10.5px; color: var(--accent); white-space: nowrap; }
+.et-marca {
+  font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
+  padding: 1px 6px; border-radius: 4px; margin-left: 5px; white-space: nowrap;
+}
+.et-marca.guia { background: #1f6feb22; color: #4d8ef7; }
+.et-marca.cond { background: #8b949e22; color: var(--muted); }
+.et-marca.sint { background: #8419c422; color: #a371f7; }
+
+/* ---------- matriz de compatibilidad ---------- */
+.et-leyenda { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 7px; }
+.et-leg { font-size: 11px; color: var(--muted); }
+.et-leg b { font-size: 11.5px; margin-right: 3px; }
+.et-tabla.matriz td:not(:first-child),
+.et-tabla.matriz th:not(:first-child) { text-align: center; width: 54px; }
+.et-tabla.matriz td:not(:first-child) { font-weight: 800; font-size: 12.5px; }
+.et-ifa {
+  display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 4px;
+  vertical-align: baseline;
+}
+.c-P { color: #2ea043; }
+.c-C { color: #d29922; }
+.c-R { color: #db6d28; }
+.c-X { color: #f85149; }
+.et-tabla.matriz-d td { font-size: 11px; }
+.et-tabla.matriz-d td:first-child { width: 160px; }
+
+/* ---------- listas ---------- */
+.et-lista { margin: 8px 0 0; padding-left: 18px; }
+.et-lista li { font-size: 12px; margin-bottom: 5px; line-height: 1.55; }
+.et-lista.check { list-style: none; padding-left: 0; }
+.et-lista.check li { padding-left: 22px; position: relative; }
+.et-lista.check li::before {
+  content: '☐'; position: absolute; left: 0; top: -1px; font-size: 14px; color: var(--muted);
+}
+
+.et-error { border-left: 3px solid #f85149; }
+.et-error button { width: auto; margin-top: 10px; }
+
+@media (max-width: 760px) {
+  .et-head { flex-wrap: wrap; gap: 8px; }
+  .et-bloque, .et-avance { order: 3; }
+  .et-avance { flex: 1 1 auto; text-align: left; }
+  .et-resp { width: auto; }
+  .et-tabla.matriz-d td:first-child { width: auto; }
+}

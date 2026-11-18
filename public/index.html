@@ -7,6 +7,7 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link href="fonts/fonts.css" rel="stylesheet">
 <link href="reglamentos/reglamentos.css" rel="stylesheet">
+<link href="etapas/etapas.css" rel="stylesheet">
 <style>
 /* Institutional layout: navy masthead with step tabs; one zone x perilla matrix seen four ways (Perillas, Calibrar, Prácticas y divisa, Ficha). Transect colors are data, not chrome. */
 :root{
@@ -364,13 +365,14 @@ svg.ch rect[data-tip]:hover,svg.ch path[data-tip]:hover{filter:brightness(1.12)}
       <button class="mbtn" id="zonesBtn" title="Agregar o quitar zonas y sectores"><i data-lucide="layers-3" class="ic"></i>Zonas del transecto</button>
     </div>
     <nav class="steps" role="tablist" aria-label="Pasos">
-      <button class="step" role="tab" id="tab-perillas"><i data-lucide="book-open" class="ic"></i>1 · Perillas</button>
-      <button class="step" role="tab" id="tab-calibrar"><i data-lucide="sliders-horizontal" class="ic"></i>2 · Calibrar</button>
-      <button class="step" role="tab" id="tab-practicas"><i data-lucide="coins" class="ic"></i>3 · Prácticas incentivables</button>
-      <button class="step" role="tab" id="tab-ficha"><i data-lucide="file-text" class="ic"></i>4 · Ficha del transecto</button>
-      <button class="step" role="tab" id="tab-graficos"><i data-lucide="chart-column" class="ic"></i>5 · Gráficos</button>
-      <button class="step" role="tab" id="tab-glosario"><i data-lucide="book-a" class="ic"></i>6 · Glosario</button>
-      <button class="step" role="tab" id="tab-reglamentos"><i data-lucide="scroll-text" class="ic"></i>7 · Reglamentos</button>
+      <button class="step" role="tab" id="tab-etapas"><i data-lucide="route" class="ic"></i>1 · Etapas del PR</button>
+      <button class="step" role="tab" id="tab-perillas"><i data-lucide="book-open" class="ic"></i>2 · Perillas</button>
+      <button class="step" role="tab" id="tab-calibrar"><i data-lucide="sliders-horizontal" class="ic"></i>3 · Calibrar</button>
+      <button class="step" role="tab" id="tab-practicas"><i data-lucide="coins" class="ic"></i>4 · Prácticas incentivables</button>
+      <button class="step" role="tab" id="tab-ficha"><i data-lucide="file-text" class="ic"></i>5 · Ficha del transecto</button>
+      <button class="step" role="tab" id="tab-graficos"><i data-lucide="chart-column" class="ic"></i>6 · Gráficos</button>
+      <button class="step" role="tab" id="tab-glosario"><i data-lucide="book-a" class="ic"></i>7 · Glosario</button>
+      <button class="step" role="tab" id="tab-reglamentos"><i data-lucide="scroll-text" class="ic"></i>8 · Reglamentos</button>
     </nav>
   </div>
 </header>
@@ -385,7 +387,11 @@ svg.ch rect[data-tip]:hover,svg.ch path[data-tip]:hover{filter:brightness(1.12)}
 
   <div class="zlegend" id="zlegend" aria-label="Zonas del transecto"></div>
 
-  <!-- 1 -->
+  <!-- 1 · Etapas del Plan Regulador. El contenido lo pinta etapas/etapas.js a partir de la
+       estructura compartida con el atlas (planoexactocr.com/data/estructura_pr.json). -->
+  <section class="view" id="v-etapas" aria-label="Etapas del Plan Regulador"></section>
+
+  <!-- 2 -->
   <section class="view" id="v-perillas" aria-label="Lámina de perillas">
     <div class="card">
       <h2 style="margin-bottom:10px"><i data-lucide="database" class="ic" style="color:var(--accent);margin-right:4px"></i>Datos del cantón</h2>
@@ -579,6 +585,7 @@ svg.ch rect[data-tip]:hover,svg.ch path[data-tip]:hover{filter:brightness(1.12)}
 <script src="vendor/html2canvas-1.4.1.min.js"></script>
 <script src="reglamentos/textos.js"></script>
 <script src="reglamentos/motor.js"></script>
+<script src="etapas/etapas.js"></script>
 
 <script>
 (function(){
@@ -923,10 +930,10 @@ function renderGlobal(){
   $('globalTxt').textContent=n?`${n} alerta${n>1?'s':''}`:'Transecto coherente';
   $('hdrCanton').textContent=`${S.datos.canton||'Cantón sin nombre'}${provOf(S.datos.canton)?', '+provOf(S.datos.canton):''} · Plan regulador territorial · valores precargados: supuestos de partida`;
 }
-const VIEWS=['perillas','calibrar','practicas','ficha','graficos','glosario','reglamentos'];
+const VIEWS=['etapas','perillas','calibrar','practicas','ficha','graficos','glosario','reglamentos'];
 function setView(v){
   S.view=v; VIEWS.forEach(x=>{ $('tab-'+x).setAttribute('aria-selected',x===v); $('v-'+x).classList.toggle('show',x===v); });
-  ({perillas:renderLamina,calibrar:renderCalibrar,practicas:renderPracticas,ficha:renderFicha,graficos:renderGraficos,glosario:renderGlosario,reglamentos:()=>{ if(window.REG) REG.render(); }})[v]();
+  ({etapas:()=>{ if(window.ETAPAS) ETAPAS.render(); },perillas:renderLamina,calibrar:renderCalibrar,practicas:renderPracticas,ficha:renderFicha,graficos:renderGraficos,glosario:renderGlosario,reglamentos:()=>{ if(window.REG) REG.render(); }})[v]();
   renderGlobal(); save();
 }
 VIEWS.forEach(x=>$('tab-'+x).addEventListener('click',()=>setView(x)));
@@ -1849,6 +1856,10 @@ window.CAL={get S(){return S},get ZONES(){return ZONES},get ZID(){return ZID},ge
 window.__buildBooklet=buildBooklet; window.__preload=preloadPdfIcons;
 
 renderCanton(); renderLegend(); renderScenarios(); setView(S.view||'calibrar');
+/* La estructura del Plan Regulador se pide al mundo público (la comparten este calibrador y
+   el atlas). Se pide sin bloquear el arranque: cuando llega, si la pestaña de etapas está
+   abierta se vuelve a pintar sola. */
+if(window.ETAPAS) ETAPAS.init().then(()=>{ if(S.view==='etapas') ETAPAS.render(); });
 syncZoneBarScroll();
 // Keep --mast-h in sync so sticky zone bar positions correctly
 function updateMastH(){
