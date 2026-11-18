@@ -56,11 +56,15 @@ Cada reglamento del plan (00 Generalidades a 09 Audiencia Pública) tiene un bor
 - **Ver resultado:** el texto final con los valores. Los valores en dorado fueron calibrados (distintos al de partida), en rojo están las perillas sin definir y en amarillo el texto por completar.
 - **Editar texto:** se puede cambiar la redacción, agregar o mover artículos y capítulos e insertar valores del calibrador. Los cambios se guardan en el navegador y viajan con el escenario.
 - **Descargar Word:** genera un .docx tamaño carta con tablas.
+- **Descargar PDF:** genera un PDF tamaño carta a partir de la misma vista de «Ver resultado» (usa `vendor/html2canvas` + `vendor/jspdf`, paginado por artículo/tabla para no cortarlos a la mitad).
 
 Estado de los borradores:
 - 01 Zonificación: adaptado del Reglamento de Zonificación y Forma Urbana de Liberia.
 - 02 Fraccionamiento y Urbanizaciones: adaptado del Reglamento de Fraccionamiento y Urbanización de Liberia.
 - 03 Mapa Oficial: adaptado del Reglamento de Mapa Oficial de Liberia. Las tablas de inventario (bienes públicos, vialidad, zonas de interés municipal) son propias de cada cantón y quedan como `[[ ]]` para incorporarlas como anexo.
+- 04 Renovación Urbana e Instrumentos de Gestión del Suelo: adaptado del reglamento homónimo de Liberia. El listado de proyectos de renovación urbana (RUA/RUV/RUU) es propio de cada cantón y queda como `[[ ]]`.
 - Los demás: se puede crear un esqueleto desde las perillas mientras llega el texto base.
+
+Nota de estilo: desde noviembre 2026 la pestaña de Reglamentos tiene un diseño más moderno (tarjetas, barra lateral con insignias, tablas con cebra, reglas de color en encabezados). Los estilos que usan `color-mix()` no se aplican en el host que arma `downloadPdf()` (ver `.rg-pdf-render` en `reglamentos.css`), porque `html2canvas` 1.4.1 no soporta esa función CSS.
 
 Formato del texto en `textos.js`: ver el comentario al inicio de `motor.js`.

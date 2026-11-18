@@ -507,11 +507,12 @@ svg.ch rect[data-tip]:hover,svg.ch path[data-tip]:hover{filter:brightness(1.12)}
     <div class="card">
       <div class="bar" style="justify-content:space-between;align-items:flex-start">
         <div><h2 style="font-size:18px"><i data-lucide="scroll-text" class="ic" style="width:20px;height:20px;color:var(--accent);margin-right:6px"></i>Borradores de reglamento</h2>
-          <p class="lead">Cada reglamento del plan regulador con sus valores conectados a las perillas: cuando calibras una perilla, los artículos y tablas que la usan se actualizan solos. Puedes editar la redacción y descargar el reglamento en Word.</p></div>
+          <p class="lead">Cada reglamento del plan regulador con sus valores conectados a las perillas: cuando calibras una perilla, los artículos y tablas que la usan se actualizan solos. Puedes editar la redacción y descargar el reglamento en Word o PDF.</p></div>
         <div class="bar">
           <button class="btn" id="rgEdit" aria-pressed="false"></button>
           <button class="btn" id="rgReset" title="Volver al borrador original"><i data-lucide="rotate-ccw" class="ic"></i>Restablecer</button>
           <button class="btn" id="rgCopy"><i data-lucide="copy" class="ic"></i>Copiar</button>
+          <button class="btn" id="rgPdf"><i data-lucide="file-text" class="ic"></i>Descargar PDF</button>
           <button class="btn primary" id="rgWord"><i data-lucide="file-down" class="ic"></i>Descargar Word</button>
         </div>
       </div>
@@ -575,6 +576,7 @@ svg.ch rect[data-tip]:hover,svg.ch path[data-tip]:hover{filter:brightness(1.12)}
 <script src="vendor/jspdf-2.5.1.umd.min.js"></script>
 <script src="vendor/jspdf-autotable-3.8.2.min.js"></script>
 <script src="vendor/lz-string-1.5.0.min.js"></script>
+<script src="vendor/html2canvas-1.4.1.min.js"></script>
 <script src="reglamentos/textos.js"></script>
 <script src="reglamentos/motor.js"></script>
 

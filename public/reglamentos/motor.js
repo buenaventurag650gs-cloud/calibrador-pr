@@ -335,10 +335,10 @@ function render(){
   $('rgEdit').setAttribute('aria-pressed',!!s.regEdit);
   $('rgEdit').innerHTML=s.regEdit?`${c.ic('eye')}Ver resultado`:`${c.ic('pencil')}Editar texto`;
   $('rgReset').disabled=!isEdited(id);
-  $('rgWord').disabled=!reg; $('rgCopy').disabled=!reg;
+  $('rgWord').disabled=!reg; $('rgCopy').disabled=!reg; $('rgPdf').disabled=!reg;
   if(!reg){
     const n=c.P.filter(p=>regOfP(p,id)).length;
-    main.innerHTML=`<div class="rg-empty">${c.ic('file-plus-2','width:28px;height:28px')}<h3>Reglamento de ${esc(NOMBRES[id])}</h3><p>Todavía no hay un borrador de este reglamento. Puedes crear un esqueleto con un artículo por cada una de sus ${n} perillas y luego completar la redacción.</p><button class="btn primary" id="rgSkel">${c.ic('wand-sparkles')}Crear esqueleto desde las perillas</button></div>`;
+    main.innerHTML=`<div class="rg-body"><div class="rg-empty">${c.ic('file-plus-2','width:28px;height:28px')}<h3>Reglamento de ${esc(NOMBRES[id])}</h3><p>Todavía no hay un borrador de este reglamento. Puedes crear un esqueleto con un artículo por cada una de sus ${n} perillas y luego completar la redacción.</p><button class="btn primary" id="rgSkel">${c.ic('wand-sparkles')}Crear esqueleto desde las perillas</button></div></div>`;
     $('rgSkel').onclick=()=>{ mut(id); s.regEdit=true; c.save(); render(); c.toast('Esqueleto creado'); };
     c.refreshIcons&&c.refreshIcons(); return;
   }
@@ -346,9 +346,9 @@ function render(){
     <div class="rg-leg"><span><i class="rv chg">valor</i> calibrado, distinto al de partida</span><span><i class="rv">valor</i> del calibrador</span><span><i class="rpd">por definir</i> perilla sin valor</span><span><i class="rpc">texto</i> por completar</span></div></header>`;
   if(!s.regEdit){
     const B=build(id);
-    main.innerHTML=head+coverage(id)+`<article class="rg-doc">${blocksHTML(B.blocks)}</article>`;
+    main.innerHTML=head+`<div class="rg-body">`+coverage(id)+`<article class="rg-doc">${blocksHTML(B.blocks)}</article></div>`;
   } else {
-    main.innerHTML=head+coverage(id)+`<div class="rg-help">${c.ic('info')}<span>Escribe libremente. Los recuadros azules son <b>valores conectados</b> a las perillas: se actualizan solos cuando calibras. Para agregar uno, pon el cursor y pulsa <b>Insertar valor</b>. Lo que va entre <code>[[ ]]</code> se marca como pendiente. Los cambios se guardan solos.</span></div>`+editorHTML(reg);
+    main.innerHTML=head+`<div class="rg-body">`+coverage(id)+`<div class="rg-help">${c.ic('info')}<span>Escribe libremente. Los recuadros azules son <b>valores conectados</b> a las perillas: se actualizan solos cuando calibras. Para agregar uno, pon el cursor y pulsa <b>Insertar valor</b>. Lo que va entre <code>[[ ]]</code> se marca como pendiente. Los cambios se guardan solos.</span></div>`+editorHTML(reg)+`</div>`;
     bindEditor(id);
   }
   main.querySelectorAll('.rg-pchip').forEach(b=>b.onclick=()=>{ if(!s.regEdit){ c.toast('Activa «Editar texto» para agregar artículos'); return; } const p=c.PBY[b.dataset.add]; const r=mut(id); r.caps[r.caps.length-1].arts.push(artFor(p)); c.save(); render(); c.toast('Artículo agregado al final'); });
@@ -561,6 +561,66 @@ function downloadWord(){
   C().toast('Word descargado');
 }
 
+/* ---------- PDF (html2canvas + jsPDF, paginado por bloques) ---------- */
+async function downloadPdf(){
+  const s=st(), c=C(), B=build(s.regSel); if(!B) return;
+  if(!(window.jspdf&&window.jspdf.jsPDF)){ c.toast('No se pudo cargar el generador de PDF'); return; }
+  if(!window.html2canvas){ c.toast('No se pudo cargar el generador de PDF'); return; }
+  const btn=$('rgPdf'); const prevHTML=btn.innerHTML; btn.disabled=true; btn.innerHTML=c.ic('loader-circle')+'Generando…';
+  const SCALE=2, CSSW=740; // ancho de medición (css px) ≈ área imprimible de una carta
+  const pageW=215.9, pageH=279.4, margin=12;
+  const contentWmm=pageW-margin*2;
+  const pxPerMM=(CSSW*SCALE)/contentWmm;
+  const pageHpxCSS=(pageH-margin*2)*(CSSW/contentWmm); // alto de página en css px, sin escalar
+  const host=document.createElement('div');
+  host.className='rg-doc rg-pdf-render';
+  host.style.cssText=`position:fixed;left:-99999px;top:0;width:${CSSW}px;background:#fff;padding:0;`;
+  const head=`<header class="rg-head"><div class="ey">Plan Regulador del cantón de ${esc(s.datos.canton||'')}</div><h2>${esc(B.reg.t)}</h2>${B.reg.fuente?`<p class="hint">${esc(B.reg.fuente)}</p>`:''}</header>`;
+  host.innerHTML=head+blocksHTML(B.blocks);
+  document.body.appendChild(host);
+  const renderHosts=[];
+  try{
+    c.refreshIcons&&c.refreshIcons();
+    await new Promise(r=>setTimeout(r,60));
+    // agrupar los hijos del documento en páginas, cortando entre bloques (nunca a mitad de una tabla o un párrafo).
+    // se usa offsetTop (no la suma de offsetHeight) porque los márgenes entre bloques colapsan en el flujo original.
+    const kids=Array.from(host.children);
+    const pages=[[]]; let pageStart=0;
+    kids.forEach(el=>{
+      const top=el.offsetTop, bottom=top+el.offsetHeight;
+      if(pages[pages.length-1].length && (bottom-pageStart)>pageHpxCSS){ pages.push([]); pageStart=top; }
+      pages[pages.length-1].push(el);
+    });
+    const {jsPDF}=window.jspdf; const doc=new jsPDF({unit:'mm',format:'letter',orientation:'portrait'});
+    let firstPage=true;
+    for(const chunk of pages){
+      if(!chunk.length) continue;
+      const pageHost=document.createElement('div');
+      pageHost.className=host.className;
+      pageHost.style.cssText=`position:fixed;left:-99999px;top:0;width:${CSSW}px;background:#fff;padding:0;`;
+      chunk.forEach(el=>pageHost.appendChild(el.cloneNode(true)));
+      document.body.appendChild(pageHost); renderHosts.push(pageHost);
+      const canvas=await window.html2canvas(pageHost,{scale:SCALE,backgroundColor:'#ffffff',useCORS:true});
+      // si el bloque (p. ej. una tabla larga) excede una página, se reparte en varias por recorte de píxeles
+      const pageHpxScaled=Math.round(pageHpxCSS*SCALE);
+      let y=0;
+      do{
+        const sliceH=Math.min(pageHpxScaled,canvas.height-y);
+        const pc=document.createElement('canvas'); pc.width=canvas.width; pc.height=sliceH;
+        pc.getContext('2d').drawImage(canvas,0,y,canvas.width,sliceH,0,0,canvas.width,sliceH);
+        const img=pc.toDataURL('image/jpeg',0.93);
+        if(!firstPage) doc.addPage(); firstPage=false;
+        doc.addImage(img,'JPEG',margin,margin,contentWmm,sliceH/pxPerMM);
+        y+=sliceH;
+      } while(y<canvas.height);
+    }
+    const name=`PR_${(s.datos.canton||'canton').replace(/[^\wÁÉÍÓÚÑáéíóúñ]+/g,'_')}_-_${s.regSel}_${NOMBRES[s.regSel].replace(/\s+/g,'_')}.pdf`;
+    doc.save(name);
+    c.toast('PDF descargado');
+  } catch(e){ c.toast('No se pudo generar el PDF'); }
+  finally{ host.remove(); renderHosts.forEach(h=>h.remove()); btn.disabled=false; btn.innerHTML=prevHTML; c.refreshIcons&&c.refreshIcons(); }
+}
+
 /* ---------- inicio ---------- */
 let bound=false;
 function bindOnce(){
@@ -569,6 +629,7 @@ function bindOnce(){
   $('rgEdit').onclick=()=>{ const s=st(); s.regEdit=!s.regEdit; c.save(); render(); };
   $('rgReset').onclick=()=>{ const s=st(); if(!isEdited(s.regSel)) return; if(!confirmDel('¿Volver al borrador original de este reglamento? Se pierden tus cambios de texto.')) return; delete s.regs[s.regSel]; c.save(); render(); c.toast('Borrador original restablecido'); };
   $('rgWord').onclick=downloadWord;
+  $('rgPdf').onclick=downloadPdf;
   $('rgCopy').onclick=copyReg;
   document.addEventListener('mousedown',e=>{ const pk=$('rgPicker'); if(pk&&pk.classList.contains('show')&&!pk.contains(e.target)&&!e.target.closest('[data-act="ins"]')) pk.classList.remove('show'); });
 }
