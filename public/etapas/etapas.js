@@ -36,6 +36,24 @@
   const URL_ESTRUCTURA = 'https://planoexactocr.com/data/estructura_pr.json';
   const URL_ATLAS = 'https://atlas.planoexactocr.com/';
 
+  // El cantón que está cargado en el calibrador, para que el atlas abra el mismo.
+  function cantonActual() {
+    const C = window.CAL;
+    return (C && C.S && C.S.datos && C.S.datos.canton) ? String(C.S.datos.canton).trim() : '';
+  }
+
+  /* Enlace al atlas: lleva el cantón y el mapa, así el botón abre ese mapa de ese cantón y
+     no la portada. Si el mapa todavía no se puede dibujar, el atlas abre su estructura
+     cartográfica en esa fila, que es donde dice qué insumo le falta. */
+  function enlaceAtlas(m) {
+    const p = new URLSearchParams();
+    const canton = cantonActual();
+    if (canton) p.set('canton', canton);
+    if (m && m.atlas) p.set('mapa', m.atlas);
+    const q = p.toString();
+    return URL_ATLAS + (q ? '?' + q : '');
+  }
+
   let E = null;          // la estructura leída
   let error = null;      // por qué no se pudo leer, si pasó
   let pedida = false;    // ya se salió a buscarla al menos una vez
@@ -117,8 +135,14 @@
     return '<div class="et-sub">Entregables formales que cierran o cruzan esta etapa</div>' +
       '<table class="et-tabla entregables"><tbody>' + lista.map((d) => {
         const hecho = estaHecho('D' + d.numero);
+        // Un hito puede cubrir varios entregables (el P7 cubre el 9, el 10 y el 11): se dice,
+        // para que no parezca que el mismo pago está repetido.
+        const otros = (d.hito_cubre || []).filter((n) => n !== d.numero);
+        const comparte = otros.length
+          ? ` <span class="et-comparte">junto con #${otros.join(' y #')}</span>` : '';
         const pago = d.hito
-          ? `<span class="et-pago">${esc(d.hito)} · mes ${d.mes} · ${d.porcentaje}%</span>` : '';
+          ? `<span class="et-pago">${esc(d.hito)} · mes ${d.mes} · ${d.porcentaje}%</span>${comparte}`
+          : '<span class="et-pago sin">sin hito de pago</span>';
         const dep = d.depende && d.depende.length
           ? `<div class="et-dep">Depende de: ${d.depende.map((n) => '#' + n).join(', ')}</div>` : '';
         return `<tr class="${hecho ? 'hecho' : ''}">` +
@@ -141,7 +165,8 @@
           + (m.condicion ? `<span class="et-marca cond">${esc(m.condicion)}</span>` : '')
           + (m.sintesis ? '<span class="et-marca sint">síntesis</span>' : '');
         const enlace = m.resuelve === 'atlas'
-          ? ` <a class="et-link" href="${URL_ATLAS}" target="_blank" rel="noopener">abrir atlas</a>` : '';
+          ? ` <a class="et-link" href="${enlaceAtlas(m)}" target="_blank" rel="noopener"` +
+            ` title="Abre este mapa de ${esc(cantonActual() || 'el cantón')} en el atlas">abrir atlas</a>` : '';
         return `<tr><td class="et-cod">${esc(m.codigo)}</td>` +
           `<td>${esc(m.nombre)} ${marcas}` +
           (m.observacion ? `<div class="et-obs">${esc(m.observacion)}</div>` : '') + '</td>' +
@@ -195,6 +220,12 @@
       cuerpo += '<div class="et-cuerpo">';
       cuerpo += `<p class="et-cierra"><b>Cierra con:</b> ${esc(et.cierra)}</p>`;
       if (prods.length) {
+        /* La etapa 3 numera sus pasos A1 a A9 y no E3.1 en adelante: así los numera el
+           desglose, porque son la ruta procedimental del EsIVA ante SETENA, no productos
+           del plan. Se dice en pantalla para que la diferencia no parezca un error. */
+        cuerpo += `<div class="et-sub">${et.numero === 3
+          ? 'Ruta procedimental del EsIVA (pasos A1 a A9 del desglose)'
+          : 'Productos de la etapa'}</div>`;
         cuerpo += '<table class="et-tabla"><thead><tr><th></th><th>Cód.</th>' +
           '<th>Actividad y entregable</th><th>Responsable</th></tr></thead><tbody>' +
           prods.map(filaProducto).join('') + '</tbody></table>';

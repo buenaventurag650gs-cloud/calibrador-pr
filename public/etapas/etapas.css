@@ -7,6 +7,9 @@
 
 .et-cab { margin-bottom: 14px; }
 .et-cab h2 { margin: 0 0 6px; }
+/* Los párrafos se cortan a una medida cómoda: a todo el ancho de la pantalla el ojo se
+   pierde al saltar de renglón. Los recuadros de abajo sí usan el ancho completo. */
+.et-cab .hint { max-width: 86ch; font-size: 12.5px; line-height: 1.55; }
 .et-cab .et-pie { margin: 12px 0 0; }
 
 /* ---------- resumen de avance ---------- */
@@ -84,7 +87,7 @@
   background: var(--bg); color: var(--muted); cursor: pointer;
 }
 .et-toggle:hover { color: var(--ink); border-color: var(--accent); }
-.et-nota { font-size: 11.5px; color: var(--muted); margin: 8px 0 0; max-width: 80ch; }
+.et-nota { font-size: 12.5px; color: var(--muted); margin: 8px 0 0; max-width: 80ch; line-height: 1.5; }
 
 /* ---------- tablas ---------- */
 .et-tabla {
@@ -96,7 +99,7 @@
   color: var(--muted); padding: 7px 10px; border-bottom: 1px solid var(--line);
   background: var(--surface); font-weight: 700;
 }
-.et-tabla td { padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.et-tabla td { padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
 .et-tabla tr:last-child td { border-bottom: none; }
 .et-tabla tr.hecho td { opacity: .55; }
 .et-tabla tr.hecho .et-act { text-decoration: line-through; }
@@ -109,18 +112,18 @@
 .et-cod label { cursor: pointer; }
 .et-act { font-weight: 600; }
 .et-ent { font-size: 11px; color: var(--ink); opacity: .8; margin-top: 2px; }
-.et-con { font-size: 10.5px; color: var(--muted); margin-top: 3px; max-width: 72ch; }
-.et-dep { font-size: 10.5px; color: var(--muted); margin-top: 3px; }
-.et-obs { font-size: 10.5px; color: var(--muted); font-style: italic; margin-top: 2px; }
-.et-resp { width: 150px; font-size: 11px; color: var(--muted); line-height: 1.5; }
-.et-norma { font-size: 10px; opacity: .85; }
+.et-con { font-size: 12.5px; color: var(--muted); margin-top: 4px; max-width: 86ch; line-height: 1.45; }
+.et-dep { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+.et-obs { font-size: 11.5px; color: var(--muted); font-style: italic; margin-top: 3px; }
+.et-resp { width: 168px; font-size: 12px; color: var(--muted); line-height: 1.5; }
+.et-norma { font-size: 11.5px; opacity: .85; }
 .et-pago {
   font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px;
   background: #2ea04322; color: #2ea043; margin-left: 6px; white-space: nowrap;
 }
-.et-link { font-size: 10.5px; color: var(--accent); white-space: nowrap; }
+.et-link { font-size: 11.5px; color: var(--accent); white-space: nowrap; }
 .et-marca {
-  font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
+  font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
   padding: 1px 6px; border-radius: 4px; margin-left: 5px; white-space: nowrap;
 }
 .et-marca.guia { background: #1f6feb22; color: #4d8ef7; }
@@ -164,3 +167,7 @@
   .et-resp { width: auto; }
   .et-tabla.matriz-d td:first-child { width: auto; }
 }
+
+/* El hito de pago y con quién se comparte. */
+.et-comparte { font-size: 11.5px; color: var(--muted); }
+.et-pago.sin { background: none; border: 1px dashed var(--line); color: var(--muted); font-weight: 400; }

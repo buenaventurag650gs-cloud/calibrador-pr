@@ -54,6 +54,19 @@ En el proyecto de Cloudflare: **Settings → Domains & Routes → Add custom dom
 
 ## Etapas del Plan Regulador (pestaña 1)
 
+Desde cada mapa del índice maestro, el botón **abrir atlas** lleva a
+`atlas.planoexactocr.com/?canton=…&mapa=…`: el atlas elige ese cantón y abre ese mapa. Si el
+mapa todavía no se puede dibujar, el atlas abre su estructura cartográfica en esa fila, que
+es donde dice qué insumo le falta.
+
+Dos cosas de la numeración que parecen errores y no lo son:
+
+- La etapa 3 numera sus pasos **A1 a A9**, no E3.1 en adelante. Así los numera el desglose,
+  porque son la ruta procedimental del EsIVA ante SETENA, no productos del plan.
+- Un **hito de pago puede cubrir varios entregables**: el P5 cubre el 5 y el 6, el P6 el 7 y
+  el 8, y el P7 el 9, el 10 y el 11. Cada entregable dice con cuáles comparte el suyo.
+
+
 El recorrido completo, de la preparación preliminar a la publicación en La Gaceta: las 9 etapas
 del MAPRIOT 2025 más el seguimiento, con sus productos, sus 15 entregables formales (que sirven
 de hitos de pago) y el índice maestro de mapas.

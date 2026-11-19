@@ -46,7 +46,7 @@ const ESTRUCTURA = {
   ],
   entregables: [
     { numero: 0, etapa: 1, nombre: 'Expediente de inicio', componentes: 'Comisión, TdR', norma: 'MAPRIOT 2025', revisa: 'Concejo', depende: [], hito: null, mes: null, porcentaje: null },
-    { numero: 3, etapa: 3, nombre: 'EsIVA Fase I', componentes: 'Informe IFA', norma: 'DE 44710', revisa: 'Comisión', depende: [2], hito: 'P3', mes: 7, porcentaje: 15 }
+    { numero: 3, etapa: 3, nombre: 'EsIVA Fase I', componentes: 'Informe IFA', norma: 'DE 44710', revisa: 'Comisión', depende: [2], hito: 'P3', mes: 7, porcentaje: 15, hito_cubre: [3, 4] }
   ],
   bloques: [{ codigo: '1', nombre: 'Variable ambiental', etapa: 3, icono: '🌱', descripcion: 'IFA' }],
   componentes: [{ codigo: '1.1', bloque: '1', nombre: 'Geoaptitud' }],
@@ -190,6 +190,41 @@ const filaCalib = todos('#v-etapas .et-tabla.mapas tbody tr')
   .find((r) => r.textContent.includes('Capacidad de carga'));
 afirmar(filaCalib && !filaCalib.querySelector('.et-link'),
   'un mapa que resuelve el calibrador no manda al atlas');
+// El enlace tiene que llevar al mapa concreto del cantón cargado, no a la portada.
+const dir = new URL(enlaces[0].href);
+afirmar(dir.searchParams.get('canton') === (w.CAL.S.datos ? w.CAL.S.datos.canton : null),
+  `el enlace lleva el cantón que está cargado (${dir.searchParams.get('canton')})`);
+afirmar(!!dir.searchParams.get('mapa'),
+  `el enlace lleva el mapa concreto, no solo el cantón (${dir.searchParams.get('mapa')})`);
+afirmar(enlaces.every((a) => new URL(a.href).searchParams.get('mapa')),
+  'todos los enlaces al atlas apuntan a un mapa');
+
+/* Un hito puede cubrir varios entregables: el P7 cubre el 9, el 10 y el 11. Antes el hito
+   vivía en un solo entregable y los demás salían sin pago, que es lo que no cuadraba al
+   leer la lista de corrido. */
+afirmar(texto().includes('junto con #'),
+  'un hito que cubre varios entregables lo dice, en vez de repetirse callado');
+afirmar(texto().includes('sin hito de pago'),
+  'un entregable sin pago lo dice, para que no parezca que se olvidó');
+
+// ---------- 6c. legibilidad ----------
+/* La tira de zonas del transecto no pinta nada en esta pestaña y ocupaba media pantalla
+   antes de que empezara el contenido. */
+const htmlCal = lee('index.html');
+afirmar(/SIN_TIRA\s*=\s*\[[^\]]*'etapas'/.test(htmlCal)
+  && /\$\('zlegend'\)\.hidden\s*=\s*SIN_TIRA/.test(htmlCal),
+  'la tira de zonas se esconde al entrar a la pestaña de etapas');
+afirmar(/\.zlegend\[hidden\]\s*\{\s*display:\s*none/.test(htmlCal),
+  'la regla de ocultar la tira le gana al display:grid, que si no la dejaría visible');
+// Los textos que se leen de corrido no bajan de 11,5 px; los distintivos sí pueden.
+const cssEtapas = fs.readFileSync(path.join(RAIZ, 'public', 'etapas', 'etapas.css'), 'utf8');
+const corrido = ['.et-con', '.et-resp', '.et-nota', '.et-dep', '.et-obs', '.et-norma', '.et-link'];
+const chico = corrido.filter((sel) => {
+  const m = new RegExp(sel.replace('.', '\\.') + '[^{]*\\{[^}]*font-size:\\s*(\\d+(?:\\.\\d+)?)px')
+    .exec(cssEtapas);
+  return m && +m[1] < 11.5;
+});
+afirmar(chico.length === 0, `el texto corrido no baja de 11,5 px (chicos: ${chico.join(', ') || 'ninguno'})`);
 
 // ---------- 8. transversales, normas y puntos a verificar ----------
 afirmar(texto().includes('Procesos transversales') && texto().includes('Participación ciudadana'),
@@ -236,6 +271,23 @@ afirmar(texto().includes('Puntos a verificar') && texto().includes('Anexo 1'),
     ];
     afirmar(huerfanos.length === 0,
       `real: ningún producto, entregable o mapa queda sin etapa (${huerfanos.join(', ')})`);
+    // Todas las etapas tienen productos: si alguna sale vacía, su tarjeta queda en 0 %
+    // para siempre y la numeración parece saltada.
+    const sinProductos = real.etapas
+      .filter((e) => !real.productos.some((p) => p.etapa === e.numero))
+      .map((e) => e.numero);
+    afirmar(sinProductos.length === 0,
+      `real: ninguna etapa se queda sin productos (vacías: ${sinProductos.join(', ') || 'ninguna'})`);
+    // Los 9 hitos de pago del cronograma cubren 13 de los 15 entregables y suman 100 %.
+    const conHito = real.entregables.filter((d) => d.hito);
+    afirmar(conHito.length === 13,
+      `real: los hitos de pago cubren 13 de los 15 entregables (son ${conHito.length})`);
+    afirmar(conHito.every((d) => (d.hito_cubre || []).includes(d.numero)),
+      'real: cada entregable con hito aparece en la lista de ese hito');
+    const porHito = {};
+    conHito.forEach((d) => { porHito[d.hito] = d.porcentaje; });
+    const suma = Object.values(porHito).reduce((a, b) => a + b, 0);
+    afirmar(suma === 100, `real: los hitos de pago suman 100 % (suman ${suma})`);
 
     const campos = ['etapas', 'productos', 'entregables', 'mapas', 'bloques', 'componentes',
       'clases_ifa', 'matriz_compatibilidad', 'condicionantes', 'transversales', 'verificar',
