@@ -1,9 +1,14 @@
 {
-  // Calibrador de perillas: sitio estático servido por Cloudflare Workers (static assets)
+  // Calibrador de perillas: sitio estático servido por Cloudflare Workers (static assets),
+  // más un script propio (worker.js) que agrega el endpoint /api/escudos para la portada
+  // del PDF de los reglamentos. El binding ASSETS es lo que le permite al script servir
+  // los archivos de ./public y leer escudos.json.
   "name": "calibrador-perillas",
   "compatibility_date": "2026-11-01",
+  "main": "worker.js",
   "assets": {
     "directory": "./public",
-    "not_found_handling": "single-page-application"
+    "not_found_handling": "single-page-application",
+    "binding": "ASSETS"
   }
 }

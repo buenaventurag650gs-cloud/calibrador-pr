@@ -14,8 +14,10 @@ No necesita servidor ni base de datos: todo corre en el navegador y los escenari
 - `public/reglamentos/reglamentos.css` — estilos de la pestaña Reglamentos.
 - `public/vendor/` — librerías incluidas (íconos Lucide, jsPDF, jsPDF-AutoTable, lz-string). No depende de CDN externos.
 - `public/fonts/` — tipografía Public Sans incluida.
+- `public/escudos.json` — escudos municipales de los 82 cantones (cantón → URL en el CDN de munis.cr). Lo usa la portada del PDF.
 - `public/_headers` — cabeceras de seguridad y caché.
-- `wrangler.jsonc` — configuración para Cloudflare Workers (static assets).
+- `worker.js` — script del Worker: sirve el sitio y agrega el endpoint `/api/escudos`.
+- `wrangler.jsonc` — configuración para Cloudflare Workers (static assets + el script de arriba).
 
 ## Publicar en Cloudflare
 
@@ -105,9 +107,9 @@ Cada reglamento del plan (00 Generalidades a 09 Audiencia Pública) tiene un bor
 
 La primera página siempre es una portada: nombre de la municipalidad, escudo del cantón, título del reglamento y crédito de PlanoExactoCR.
 
-- **Escudo municipal:** se pide a `atlas.planoexactocr.com/api/escudos?canton=<cantón>` (el mismo endpoint que ya usa el atlas para imprimir), que lo devuelve en base64 — así entra al PDF sin pelear con CORS ni con bloqueo por hotlink del CDN de munis.cr. Si el cantón no está en esa base o el atlas no responde en 6s, la portada sigue sin escudo (círculo con la palabra "Escudo").
+- **Escudo municipal:** se pide al endpoint propio `/api/escudos?canton=<cantón>` (ver `worker.js`), que lo devuelve en base64. Hace falta el rodeo porque el CDN de munis.cr, donde viven los escudos, no manda cabeceras CORS y bloquea el hotlink: el navegador no puede meterlo en un canvas sin "ensuciarlo", y un canvas sucio no se puede exportar a PDF. El Worker sí lo puede pedir, porque corre en el borde de Cloudflare. Si el cantón no está en la base o el endpoint no responde en 8s, la portada sigue sin escudo (círculo con la palabra "Escudo").
 - **Logo de PlanoExactoCR:** el isotipo va incrustado como SVG directo en `motor.js` (constante `PE_LOGO_SVG`), sin depender de red.
-- Si se cambia algún dato de un escudo, se corrige una sola vez en `muni/escudos.json` del repo de PlanoExactoCR y se refleja en todos los productos que usan ese endpoint.
+- **Por qué una copia propia y no la del atlas:** el atlas de PlanoExactoCR tiene este mismo endpoint, pero está detrás de Cloudflare Access con su propia política. Una petición desde otro dominio no lleva la cookie de sesión de ese dominio, así que Access la intercepta y devuelve la pantalla de login en vez del escudo. Con el endpoint en el propio Worker la petición es del mismo origen y viaja con la sesión de Access que el usuario ya tiene abierta. La contra es que la base está duplicada: si se corrige un escudo hay que corregirlo en `public/escudos.json` de acá **y** en `muni/escudos.json` del atlas.
 
 Estado de los borradores:
 - 01 Zonificación: adaptado del Reglamento de Zonificación y Forma Urbana de Liberia.

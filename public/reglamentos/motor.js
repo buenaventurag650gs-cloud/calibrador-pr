@@ -30,9 +30,10 @@ const TOK=/\{\{([^{}]+)\}\}|\[\[([^\[\]]*)\]\]/g;
 const BLOCK=/^(tabla:|ficha$|zonas$|usos$|practicas$)/;
 const FICHA_DEF=['A05','A03','B01','B02','B03','F05','C01','C02','C03','C04','C09','D01','D05','D03','D08','D02','D07','E01','E02','E03','E05','E06','F01'];
 const NOMBRES={'00':'Generalidades','01':'Zonificación','02':'Fraccionamiento y Urbanizaciones','03':'Mapa Oficial','04':'Renovación Urbana','05':'Construcciones','06':'Vialidad y Movilidad','07':'Espacio Público y Paisaje','08':'Publicidad Exterior','09':'Audiencia Pública'};
-/* Base de escudos municipales, compartida por el atlas (atlas.planoexactocr.com). Devuelve
-   la imagen ya en base64 (?canton=...) para que entre al PDF sin pelear con CORS/hotlink. */
-const ESCUDOS_API='https://atlas.planoexactocr.com/api/escudos';
+/* Escudos municipales: endpoint del propio Worker (ver worker.js y public/escudos.json).
+   Devuelve la imagen ya en base64 para que entre al PDF sin pelear con CORS ni hotlink.
+   Es del Calibrador, no del atlas, para no depender de los permisos de otra aplicación. */
+const ESCUDOS_API='/api/escudos';
 /* Isotipo de PlanoExactoCR (trazos vectoriales, sin red) para el pie de la portada del PDF. */
 const PE_LOGO_SVG='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 322.39 256.00"><g transform="translate(161.195,128.000) scale(2.38589) translate(-0.000,-0.000)"><path d="M0.000,41.913 L55.826,14.000 L43.503,7.839 L35.677,11.752 L40.174,14.000 L0.000,34.087 L-40.174,14.000 L-35.677,11.752 L-43.503,7.839 L-55.826,14.000 Z" fill="#073B32"/><path d="M0.000,27.913 L55.826,0.000 L43.503,-6.161 L35.677,-2.248 L40.174,0.000 L0.000,20.087 L-40.174,0.000 L-35.677,-2.248 L-43.503,-6.161 L-55.826,0.000 Z" fill="#159B75"/><path d="M-55.826,-14.000 L0.000,13.913 L55.826,-14.000 L0.000,-41.913 Z M40.174,-14.000 L0.000,6.087 L-40.174,-14.000 L0.000,-34.087 Z" fill="#073B32"/></g></svg>';
 
@@ -568,16 +569,19 @@ function downloadWord(){
 
 /* Escudo municipal: lo sirve el atlas (ya resuelto en base64, listo para el PDF sin CORS).
    Si el cantón no está en esa base, o el atlas no responde a tiempo, sigue sin escudo. */
+const ESCUDO_CACHE={}; // cantón → base64 (o null): un PDF más del mismo cantón ya no vuelve a pedirlo
 async function fetchEscudo(canton){
   if(!canton) return null;
+  if(canton in ESCUDO_CACHE) return ESCUDO_CACHE[canton];
+  let img=null;
   try{
-    const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),6000);
+    const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),8000);
     const r=await fetch(ESCUDOS_API+'?canton='+encodeURIComponent(canton),{signal:ctrl.signal});
     clearTimeout(t);
-    if(!r.ok) return null;
-    const j=await r.json();
-    return j.imagen||null;
-  }catch(e){ return null; }
+    if(r.ok){ const j=await r.json(); img=j.imagen||null; }
+  }catch(e){ img=null; }
+  ESCUDO_CACHE[canton]=img;
+  return img;
 }
 function fechaLarga(){
   const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
