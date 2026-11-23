@@ -99,7 +99,15 @@ Cada reglamento del plan (00 Generalidades a 09 Audiencia Pública) tiene un bor
 - **Ver resultado:** el texto final con los valores. Los valores en dorado fueron calibrados (distintos al de partida), en rojo están las perillas sin definir y en amarillo el texto por completar.
 - **Editar texto:** se puede cambiar la redacción, agregar o mover artículos y capítulos e insertar valores del calibrador. Los cambios se guardan en el navegador y viajan con el escenario.
 - **Descargar Word:** genera un .docx tamaño carta con tablas.
-- **Descargar PDF:** genera un PDF tamaño carta a partir de la misma vista de «Ver resultado» (usa `vendor/html2canvas` + `vendor/jspdf`, paginado por artículo/tabla para no cortarlos a la mitad).
+- **Descargar PDF:** genera un PDF tamaño carta a partir de la misma vista de «Ver resultado» (usa `vendor/html2canvas` + `vendor/jspdf`, paginado por artículo/tabla para no cortarlos a la mitad). Lleva portada propia (ver abajo) y el PDF siempre sale en tema claro, sin importar el tema de la pantalla desde la que se genera.
+
+### Portada del PDF
+
+La primera página siempre es una portada: nombre de la municipalidad, escudo del cantón, título del reglamento y crédito de PlanoExactoCR.
+
+- **Escudo municipal:** se pide a `atlas.planoexactocr.com/api/escudos?canton=<cantón>` (el mismo endpoint que ya usa el atlas para imprimir), que lo devuelve en base64 — así entra al PDF sin pelear con CORS ni con bloqueo por hotlink del CDN de munis.cr. Si el cantón no está en esa base o el atlas no responde en 6s, la portada sigue sin escudo (círculo con la palabra "Escudo").
+- **Logo de PlanoExactoCR:** el isotipo va incrustado como SVG directo en `motor.js` (constante `PE_LOGO_SVG`), sin depender de red.
+- Si se cambia algún dato de un escudo, se corrige una sola vez en `muni/escudos.json` del repo de PlanoExactoCR y se refleja en todos los productos que usan ese endpoint.
 
 Estado de los borradores:
 - 01 Zonificación: adaptado del Reglamento de Zonificación y Forma Urbana de Liberia.
@@ -108,6 +116,6 @@ Estado de los borradores:
 - 04 Renovación Urbana e Instrumentos de Gestión del Suelo: adaptado del reglamento homónimo de Liberia. El listado de proyectos de renovación urbana (RUA/RUV/RUU) es propio de cada cantón y queda como `[[ ]]`.
 - Los demás: se puede crear un esqueleto desde las perillas mientras llega el texto base.
 
-Nota de estilo: desde noviembre 2026 la pestaña de Reglamentos tiene un diseño más moderno (tarjetas, barra lateral con insignias, tablas con cebra, reglas de color en encabezados). Los estilos que usan `color-mix()` no se aplican en el host que arma `downloadPdf()` (ver `.rg-pdf-render` en `reglamentos.css`), porque `html2canvas` 1.4.1 no soporta esa función CSS.
+Nota de estilo: desde noviembre 2026 la pestaña de Reglamentos tiene un diseño más moderno (tarjetas, barra lateral con insignias, tablas con cebra, reglas de color en encabezados). El host que arma `downloadPdf()` (clase `.rg-pdf-render` en `reglamentos.css`) fija su propia paleta clara —no hereda el tema oscuro de la pantalla— y reemplaza cada `color-mix()` por su color plano equivalente, porque `html2canvas` 1.4.1 no soporta ni el tema oscuro vía variables heredadas ni esa función CSS; sin esto el texto salía gris claro y las cajas oscuras eran ilegibles sobre el fondo blanco del PDF cuando se generaba desde una pantalla en modo oscuro.
 
 Formato del texto en `textos.js`: ver el comentario al inicio de `motor.js`.

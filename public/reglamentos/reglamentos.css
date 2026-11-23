@@ -111,8 +111,50 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .rpd,:root:not([data-theme="light"]) .rg-tbl td.pd{background:#4a1d1a}:root:not([data-theme="light"]) .rpc{background:#4a4110;color:#ffe9a0}}
 :root[data-theme="dark"] .rpd,:root[data-theme="dark"] .rg-tbl td.pd{background:#4a1d1a}
 :root[data-theme="dark"] .rpc{background:#4a4110;color:#ffe9a0}
-/* Exportar a PDF: html2canvas no soporta color-mix(), se sustituye por colores planos equivalentes */
-.rg-pdf-render{background:#fff}
+/* ===== Exportar a PDF ===== */
+/* El render del PDF ocurre fuera de pantalla con html2canvas, que no entiende color-mix()
+   y que no debe heredar el tema oscuro de la pantalla (el PDF siempre es claro, para imprimir).
+   Por eso .rg-pdf-render fija su propia paleta clara —igual a la de :root en modo claro— en vez
+   de depender de las variables heredadas, y reemplaza cada color-mix() por su color plano. */
+.rg-pdf-render{
+  --bg:#f2f4f7; --surface:#ffffff; --ink:#1b2633; --muted:#586577; --line:#d7dde5;
+  --navy:#14304f; --accent:#1f4e79; --accent-soft:#e2eaf3; --gold:#a8822a; --gold-soft:#f5ecd6;
+  --warn:#a55a12; --crit:#b42318; --ok:#2e7d4f;
+  background:#fff;color:var(--ink);color-scheme:light;
+}
 .rg-pdf-render .rg-head{background:#fff}
 .rg-pdf-render .rg-leg i::before{border-color:var(--accent)}
-.rg-pdf-render .rg-tbl tbody tr:nth-child(even) td{background:var(--bg)}
+.rg-pdf-render .rg-tbl tbody tr:nth-child(even) td{background:#f6f8fb}
+.rg-pdf-render .rpd,.rg-pdf-render .rg-tbl td.pd{background:#fdecea!important;color:var(--crit)}
+.rg-pdf-render .rpc{background:#fff4b8!important;color:#6b5300}
+
+/* ---------- Portada ---------- */
+.rg-cover{position:relative;width:100%;height:100%;box-sizing:border-box;background:#fff;color:#1b2633;
+  font-family:"Public Sans","Segoe UI",Roboto,Arial,sans-serif;display:flex;flex-direction:column;
+  justify-content:space-between;padding:0 54px 44px}
+.rg-cover-top{height:10px;background:linear-gradient(90deg,#14304f,#1f4e79)}
+.rg-cover-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:40px 0}
+.rg-cover-escudo{width:148px;height:148px;display:flex;align-items:center;justify-content:center;
+  margin-bottom:22px}
+.rg-cover-escudo img{max-width:100%;max-height:100%;object-fit:contain}
+.rg-cover-escudo.ph{width:148px;height:148px;border:2px solid #d7dde5;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;color:#586577;font-size:12px;
+  text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:22px}
+.rg-cover-muni{font-size:15px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  color:#14304f}
+.rg-cover-prov{font-size:13px;color:#586577;margin-top:6px}
+.rg-cover-div{width:64px;height:3px;border-radius:3px;background:#1f4e79;margin:30px 0}
+.rg-cover-eyebrow{font-size:12.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+  color:#1f4e79}
+.rg-cover-title{font-size:32px;font-weight:800;letter-spacing:-.01em;color:#14304f;margin-top:10px;
+  line-height:1.25;max-width:560px}
+.rg-cover-title small{display:block;font-size:14px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:#1f4e79;margin-bottom:6px}
+.rg-cover-sub{font-size:13px;color:#586577;margin-top:14px;max-width:520px}
+.rg-cover-foot{display:flex;align-items:center;justify-content:space-between;border-top:1px solid #d7dde5;
+  padding-top:18px}
+.rg-cover-date{font-size:11.5px;color:#586577}
+.rg-cover-brand{display:flex;align-items:center;gap:8px;font-size:10.5px;color:#586577;
+  text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+.rg-cover-brand svg{height:16px;width:auto;display:block}

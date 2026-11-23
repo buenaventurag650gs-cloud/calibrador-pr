@@ -30,6 +30,11 @@ const TOK=/\{\{([^{}]+)\}\}|\[\[([^\[\]]*)\]\]/g;
 const BLOCK=/^(tabla:|ficha$|zonas$|usos$|practicas$)/;
 const FICHA_DEF=['A05','A03','B01','B02','B03','F05','C01','C02','C03','C04','C09','D01','D05','D03','D08','D02','D07','E01','E02','E03','E05','E06','F01'];
 const NOMBRES={'00':'Generalidades','01':'Zonificación','02':'Fraccionamiento y Urbanizaciones','03':'Mapa Oficial','04':'Renovación Urbana','05':'Construcciones','06':'Vialidad y Movilidad','07':'Espacio Público y Paisaje','08':'Publicidad Exterior','09':'Audiencia Pública'};
+/* Base de escudos municipales, compartida por el atlas (atlas.planoexactocr.com). Devuelve
+   la imagen ya en base64 (?canton=...) para que entre al PDF sin pelear con CORS/hotlink. */
+const ESCUDOS_API='https://atlas.planoexactocr.com/api/escudos';
+/* Isotipo de PlanoExactoCR (trazos vectoriales, sin red) para el pie de la portada del PDF. */
+const PE_LOGO_SVG='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 322.39 256.00"><g transform="translate(161.195,128.000) scale(2.38589) translate(-0.000,-0.000)"><path d="M0.000,41.913 L55.826,14.000 L43.503,7.839 L35.677,11.752 L40.174,14.000 L0.000,34.087 L-40.174,14.000 L-35.677,11.752 L-43.503,7.839 L-55.826,14.000 Z" fill="#073B32"/><path d="M0.000,27.913 L55.826,0.000 L43.503,-6.161 L35.677,-2.248 L40.174,0.000 L0.000,20.087 L-40.174,0.000 L-35.677,-2.248 L-43.503,-6.161 L-55.826,0.000 Z" fill="#159B75"/><path d="M-55.826,-14.000 L0.000,13.913 L55.826,-14.000 L0.000,-41.913 Z M40.174,-14.000 L0.000,6.087 L-40.174,-14.000 L0.000,-34.087 Z" fill="#073B32"/></g></svg>';
 
 /* ---------- estado ---------- */
 function st(){ const s=S(); if(!s.regs||typeof s.regs!=='object') s.regs={}; if(!s.regSel) s.regSel='01'; return s; }
@@ -561,7 +566,49 @@ function downloadWord(){
   C().toast('Word descargado');
 }
 
-/* ---------- PDF (html2canvas + jsPDF, paginado por bloques) ---------- */
+/* Escudo municipal: lo sirve el atlas (ya resuelto en base64, listo para el PDF sin CORS).
+   Si el cantón no está en esa base, o el atlas no responde a tiempo, sigue sin escudo. */
+async function fetchEscudo(canton){
+  if(!canton) return null;
+  try{
+    const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),6000);
+    const r=await fetch(ESCUDOS_API+'?canton='+encodeURIComponent(canton),{signal:ctrl.signal});
+    clearTimeout(t);
+    if(!r.ok) return null;
+    const j=await r.json();
+    return j.imagen||null;
+  }catch(e){ return null; }
+}
+function fechaLarga(){
+  const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const d=new Date();
+  return `${d.getDate()} de ${MESES[d.getMonth()]} de ${d.getFullYear()}`;
+}
+/* ---------- Portada ---------- */
+function buildCoverHTML(s,B,escudoImg){
+  const canton=s.datos.canton||'', prov=(C().provOf&&C().provOf(canton))||'';
+  const escudo=escudoImg
+    ? `<div class="rg-cover-escudo"><img src="${escudoImg}" alt=""></div>`
+    : `<div class="rg-cover-escudo ph">Escudo</div>`;
+  return `<div class="rg-cover">
+    <div class="rg-cover-top"></div>
+    <div class="rg-cover-body">
+      ${escudo}
+      <div class="rg-cover-muni">Municipalidad${canton?' de '+esc(canton):''}</div>
+      <div class="rg-cover-prov">${canton?`Cantón de ${esc(canton)}${prov?', '+esc(prov):''} · Costa Rica`:'Costa Rica'}</div>
+      <div class="rg-cover-div"></div>
+      <div class="rg-cover-eyebrow">Plan Regulador</div>
+      <div class="rg-cover-title"><small>Reglamento ${esc(s.regSel)}</small>${esc(B.reg.t)}</div>
+      ${B.reg.fuente?`<div class="rg-cover-sub">${esc(B.reg.fuente)}</div>`:''}
+    </div>
+    <div class="rg-cover-foot">
+      <div class="rg-cover-date">Documento generado el ${fechaLarga()}</div>
+      <div class="rg-cover-brand">${PE_LOGO_SVG}PlanoExactoCR</div>
+    </div>
+  </div>`;
+}
+
+/* ---------- PDF (html2canvas + jsPDF, portada + paginado por bloques) ---------- */
 async function downloadPdf(){
   const s=st(), c=C(), B=build(s.regSel); if(!B) return;
   if(!(window.jspdf&&window.jspdf.jsPDF)){ c.toast('No se pudo cargar el generador de PDF'); return; }
@@ -572,14 +619,43 @@ async function downloadPdf(){
   const contentWmm=pageW-margin*2;
   const pxPerMM=(CSSW*SCALE)/contentWmm;
   const pageHpxCSS=(pageH-margin*2)*(CSSW/contentWmm); // alto de página en css px, sin escalar
-  const host=document.createElement('div');
-  host.className='rg-doc rg-pdf-render';
-  host.style.cssText=`position:fixed;left:-99999px;top:0;width:${CSSW}px;background:#fff;padding:0;`;
-  const head=`<header class="rg-head"><div class="ey">Plan Regulador del cantón de ${esc(s.datos.canton||'')}</div><h2>${esc(B.reg.t)}</h2>${B.reg.fuente?`<p class="hint">${esc(B.reg.fuente)}</p>`:''}</header>`;
-  host.innerHTML=head+blocksHTML(B.blocks);
-  document.body.appendChild(host);
+  // El PDF siempre es claro, sin importar el tema de la pantalla: se fuerza mientras se genera.
+  const root=document.documentElement, prevTheme=root.getAttribute('data-theme');
+  root.setAttribute('data-theme','light');
+  const mkHost=()=>{
+    const h=document.createElement('div');
+    h.className='rg-doc rg-pdf-render';
+    h.style.cssText=`position:fixed;left:-99999px;top:0;width:${CSSW}px;background:#fff;padding:0;`;
+    return h;
+  };
   const renderHosts=[];
+  const renderPage=async(el)=>{
+    document.body.appendChild(el); renderHosts.push(el);
+    return window.html2canvas(el,{scale:SCALE,backgroundColor:'#ffffff',useCORS:true});
+  };
+  const addCanvas=(doc,canvas,isFirst)=>{
+    // si el contenido (p. ej. una tabla larga) excede una página, se reparte por recorte de píxeles
+    const pageHpxScaled=Math.round(pageHpxCSS*SCALE);
+    let y=0, first=isFirst;
+    do{
+      const sliceH=Math.min(pageHpxScaled,canvas.height-y);
+      const pc=document.createElement('canvas'); pc.width=canvas.width; pc.height=sliceH;
+      pc.getContext('2d').drawImage(canvas,0,y,canvas.width,sliceH,0,0,canvas.width,sliceH);
+      const img=pc.toDataURL('image/jpeg',0.93);
+      if(!first) doc.addPage(); first=false;
+      doc.addImage(img,'JPEG',margin,margin,contentWmm,sliceH/pxPerMM);
+      y+=sliceH;
+    } while(y<canvas.height);
+  };
   try{
+    const escudoImg=await fetchEscudo(s.datos.canton);
+    const coverHost=mkHost();
+    coverHost.style.height=pageHpxCSS+'px';
+    coverHost.innerHTML=buildCoverHTML(s,B,escudoImg);
+    const head=`<header class="rg-head"><div class="ey">Plan Regulador del cantón de ${esc(s.datos.canton||'')}</div><h2>${esc(B.reg.t)}</h2>${B.reg.fuente?`<p class="hint">${esc(B.reg.fuente)}</p>`:''}</header>`;
+    const host=mkHost();
+    host.innerHTML=head+blocksHTML(B.blocks);
+    document.body.appendChild(host);
     c.refreshIcons&&c.refreshIcons();
     await new Promise(r=>setTimeout(r,60));
     // agrupar los hijos del documento en páginas, cortando entre bloques (nunca a mitad de una tabla o un párrafo).
@@ -592,33 +668,24 @@ async function downloadPdf(){
       pages[pages.length-1].push(el);
     });
     const {jsPDF}=window.jspdf; const doc=new jsPDF({unit:'mm',format:'letter',orientation:'portrait'});
-    let firstPage=true;
+    const coverCanvas=await renderPage(coverHost);
+    addCanvas(doc,coverCanvas,true);
     for(const chunk of pages){
       if(!chunk.length) continue;
-      const pageHost=document.createElement('div');
-      pageHost.className=host.className;
-      pageHost.style.cssText=`position:fixed;left:-99999px;top:0;width:${CSSW}px;background:#fff;padding:0;`;
+      const pageHost=mkHost();
       chunk.forEach(el=>pageHost.appendChild(el.cloneNode(true)));
-      document.body.appendChild(pageHost); renderHosts.push(pageHost);
-      const canvas=await window.html2canvas(pageHost,{scale:SCALE,backgroundColor:'#ffffff',useCORS:true});
-      // si el bloque (p. ej. una tabla larga) excede una página, se reparte en varias por recorte de píxeles
-      const pageHpxScaled=Math.round(pageHpxCSS*SCALE);
-      let y=0;
-      do{
-        const sliceH=Math.min(pageHpxScaled,canvas.height-y);
-        const pc=document.createElement('canvas'); pc.width=canvas.width; pc.height=sliceH;
-        pc.getContext('2d').drawImage(canvas,0,y,canvas.width,sliceH,0,0,canvas.width,sliceH);
-        const img=pc.toDataURL('image/jpeg',0.93);
-        if(!firstPage) doc.addPage(); firstPage=false;
-        doc.addImage(img,'JPEG',margin,margin,contentWmm,sliceH/pxPerMM);
-        y+=sliceH;
-      } while(y<canvas.height);
+      const canvas=await renderPage(pageHost);
+      addCanvas(doc,canvas,false);
     }
     const name=`PR_${(s.datos.canton||'canton').replace(/[^\wÁÉÍÓÚÑáéíóúñ]+/g,'_')}_-_${s.regSel}_${NOMBRES[s.regSel].replace(/\s+/g,'_')}.pdf`;
     doc.save(name);
     c.toast('PDF descargado');
   } catch(e){ c.toast('No se pudo generar el PDF'); }
-  finally{ host.remove(); renderHosts.forEach(h=>h.remove()); btn.disabled=false; btn.innerHTML=prevHTML; c.refreshIcons&&c.refreshIcons(); }
+  finally{
+    renderHosts.forEach(h=>h.remove());
+    if(prevTheme==null) root.removeAttribute('data-theme'); else root.setAttribute('data-theme',prevTheme);
+    btn.disabled=false; btn.innerHTML=prevHTML; c.refreshIcons&&c.refreshIcons();
+  }
 }
 
 /* ---------- inicio ---------- */
