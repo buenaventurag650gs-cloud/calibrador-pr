@@ -157,9 +157,15 @@
       }).join('') + '</tbody></table>';
   }
 
-  function tablaMapas(lista) {
-    if (!lista.length) return '';
-    return '<table class="et-tabla mapas"><thead><tr><th>Código</th><th>Mapa</th>' +
+  // Nombre del componente (el eje de lectura: ambiental, social, físico-espacial…) a partir
+  // de su código ("2.1" -> "Eje social"). Viene de la misma estructura compartida.
+  function nombreComponente(cod) {
+    const c = E.componentes && E.componentes.find((x) => x.codigo === cod);
+    return c ? c.nombre : cod;
+  }
+
+  function filasMapas(lista) {
+    return '<table class="et-tabla mapas"><thead><tr><th>Código</th><th>Apartado</th>' +
       '<th>Lo resuelve</th></tr></thead><tbody>' + lista.map((m) => {
         const marcas = (m.guia_invu ? '<span class="et-marca guia">Guía INVU</span>' : '')
           + (m.condicion ? `<span class="et-marca cond">${esc(m.condicion)}</span>` : '')
@@ -172,6 +178,30 @@
           (m.observacion ? `<div class="et-obs">${esc(m.observacion)}</div>` : '') + '</td>' +
           `<td class="et-resp">${chipQuien(m.resuelve)}${enlace}</td></tr>`;
       }).join('') + '</tbody></table>';
+  }
+
+  /* Los mapas de una etapa se agrupan por componente: es el eje de lectura del territorio
+     (ambiental -> geoaptitud, bioaptitud…; diagnóstico -> social, físico-espacial, económico,
+     político-institucional, jurídico…). Antes salían en una sola lista plana y se perdía esa
+     organización; ahora cada eje aparece con su propio encabezado y su desglose de apartados.
+     Si la etapa solo tiene un componente, el encabezado no aporta nada y se omite. */
+  function tablaMapas(lista) {
+    if (!lista.length) return '';
+    const grupos = []; const porCod = {};
+    lista.forEach((m) => {
+      if (!porCod[m.componente]) {
+        porCod[m.componente] = { cod: m.componente, nombre: nombreComponente(m.componente), items: [] };
+        grupos.push(porCod[m.componente]);
+      }
+      porCod[m.componente].items.push(m);
+    });
+    if (grupos.length <= 1) return filasMapas(lista);
+    return grupos.map((g) =>
+      `<div class="et-eje"><span class="et-eje-cod">${esc(g.cod)}</span>` +
+      `<span class="et-eje-nom">${esc(g.nombre)}</span>` +
+      `<span class="et-eje-n">${g.items.length} apartado${g.items.length === 1 ? '' : 's'}</span></div>` +
+      filasMapas(g.items)
+    ).join('');
   }
 
   // Matriz C: compatibilidad de la zona propuesta con la clase IFA. Es trabajo del

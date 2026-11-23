@@ -19,7 +19,6 @@
 .rg-head{position:relative;padding:26px 34px 18px;margin-bottom:0;background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 6%,var(--surface)),var(--surface));border-bottom:1px solid var(--line)}
 .rg-head .ey{font-size:11.5px;color:var(--accent);text-transform:uppercase;letter-spacing:.09em;font-weight:700}
 .rg-head h2{font-size:23px;margin:4px 0 6px;color:var(--navy);letter-spacing:-.01em}
-:root[data-theme="dark"] .rg-head h2{color:var(--ink)}
 .rg-head .hint{font-size:12.5px;color:var(--muted);margin:0 0 4px;max-width:72ch}
 .rg-leg{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:10px;font-size:11.5px;color:var(--muted)}
 .rg-leg i{font-style:normal;display:inline-flex;align-items:center;gap:5px}
@@ -31,15 +30,11 @@
 .rg-doc{max-width:900px;font-size:14.5px;line-height:1.65;color:var(--ink)}
 .rg-cap{font-size:19px;font-weight:800;letter-spacing:-.01em;text-align:left;margin:38px 0 18px;padding-top:22px;color:var(--navy);position:relative}
 .rg-cap::before{content:'';position:absolute;top:0;left:0;width:46px;height:3px;border-radius:3px;background:var(--accent)}
-:root[data-theme="dark"] .rg-cap{color:var(--ink)}
 .rg-cap span{display:block;font-size:11px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;font-weight:800;margin-bottom:5px}
-:root[data-theme="dark"] .rg-cap span{color:var(--accent)}
 .rg-art{font-size:15px;font-weight:700;margin:26px 0 10px;scroll-margin-top:calc(var(--mast-h,160px) + 16px);padding-left:14px;border-left:3px solid var(--accent);color:var(--navy)}
-:root[data-theme="dark"] .rg-art{color:var(--ink)}
 .rg-p{margin:0 0 10px;text-align:justify;hyphens:auto}
 .rg-p.li{padding-left:26px;text-indent:-18px;text-align:left}
 .rv{background:var(--accent-soft);border-radius:4px;padding:1px 5px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--navy)}
-:root[data-theme="dark"] .rv{color:var(--ink)}
 .rv.chg{background:var(--gold-soft);box-shadow:inset 0 -2px 0 var(--gold);cursor:help}
 .rpd{background:#fdecea;color:var(--crit);border-radius:4px;padding:1px 5px;font-weight:700}
 .rpc{background:#fff4b8;color:#6b5300;border-radius:4px;padding:1px 5px}
@@ -54,7 +49,6 @@
 .rg-tbl tbody tr:last-child td{border-bottom:none}
 .rg-tbl tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--accent) 3%,transparent)}
 .rg-tbl td.rh{text-align:left;font-weight:700;background:var(--bg)!important;min-width:170px;color:var(--navy)}
-:root[data-theme="dark"] .rg-tbl td.rh{color:var(--ink)}
 .rg-tbl.ficha td{text-align:left}
 .rg-tbl.ficha td:first-child{width:38%}
 .rg-tbl td.pd{color:var(--crit);background:#fdecea!important;font-weight:600}
@@ -63,7 +57,6 @@
 .rg-tbl td.err{background:var(--crit)!important;color:#fff}
 .rg-tbl .rcode{display:inline-block;font-size:10.5px;color:var(--muted);margin-right:5px;font-weight:600}
 .rg-fig figcaption{font-weight:700;font-size:12px;margin:14px 0 6px;color:var(--navy)}
-:root[data-theme="dark"] .rg-fig figcaption{color:var(--ink)}
 .rg-cov{border:1px solid color-mix(in srgb,var(--warn) 45%,var(--line));background:color-mix(in srgb,var(--warn) 7%,var(--surface));border-radius:12px;padding:12px 16px;margin:0 0 18px;font-size:13px;display:flex;gap:10px;align-items:flex-start}
 .rg-cov::before{content:'';flex:0 0 auto;width:4px;align-self:stretch;border-radius:3px;background:var(--warn);margin-top:1px}
 .rg-cov.ok{border-color:color-mix(in srgb,var(--ok) 45%,var(--line));background:color-mix(in srgb,var(--ok) 7%,var(--surface));align-items:center}
@@ -108,9 +101,21 @@
 .rg-pk-h{display:flex;justify-content:space-between;align-items:center}
 .rg-pk-o{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
 .rg-pk-o .chip{font-size:11.5px;padding:3px 8px}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .rpd,:root:not([data-theme="light"]) .rg-tbl td.pd{background:#4a1d1a}:root:not([data-theme="light"]) .rpc{background:#4a4110;color:#ffe9a0}}
-:root[data-theme="dark"] .rpd,:root[data-theme="dark"] .rg-tbl td.pd{background:#4a1d1a}
-:root[data-theme="dark"] .rpc{background:#4a4110;color:#ffe9a0}
+/* Modo oscuro: estos títulos usan --navy como color de letra, pero --navy se vuelve casi
+   negro en oscuro (es el color de fondo del masthead), así que sin este bloque quedan casi
+   invisibles. El bloque depende de prefers-color-scheme, no de un atributo data-theme que
+   esta app nunca pone (solo lo fuerza a "light" al exportar el PDF), así que es la única
+   forma real de que el ajuste llegue a alguien en modo oscuro del sistema. */
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .rpd,:root:not([data-theme="light"]) .rg-tbl td.pd{background:#4a1d1a}
+  :root:not([data-theme="light"]) .rpc{background:#4a4110;color:#ffe9a0}
+  :root:not([data-theme="light"]) .rg-head h2,
+  :root:not([data-theme="light"]) .rg-cap,
+  :root:not([data-theme="light"]) .rg-art,
+  :root:not([data-theme="light"]) .rv,
+  :root:not([data-theme="light"]) .rg-tbl td.rh,
+  :root:not([data-theme="light"]) .rg-fig figcaption{color:var(--ink)}
+  :root:not([data-theme="light"]) .rg-prog-bar>span{background:linear-gradient(90deg,var(--accent),#cfe3f6)}
+}
 /* ===== Aviso de progreso al armar el PDF ===== */
 /* Reusa .modal/.dlg del calibrador para que se vea como el resto de los diálogos. */
 .rg-prog .dlg{max-width:460px}
@@ -119,7 +124,6 @@
 .rg-prog-bar>span{display:block;height:100%;width:0;border-radius:5px;
   background:linear-gradient(90deg,var(--accent),var(--navy));
   transition:width .35s cubic-bezier(.4,0,.2,1)}
-:root[data-theme="dark"] .rg-prog-bar>span{background:linear-gradient(90deg,var(--accent),#cfe3f6)}
 .rg-prog-paso{margin:2px 0 0;font-weight:600;font-size:13.5px;color:var(--ink)}
 /* La frase suelta cambia en cada página: se desvanece al entrar para que el cambio no
    pegue un brinco seco cada vez. */
