@@ -277,6 +277,27 @@
       '</div>';
   }
 
+  /* Avance de un recorte de etapas (Insumos, Trámite). No repite los indicadores del
+     proceso completo: solo cuánto de estas etapas está marcado y quién las resuelve. */
+  function avanceDeVista(etapas) {
+    const nums = etapas.map((e) => e.numero);
+    const prods = E.productos.filter((p) => nums.includes(p.etapa));
+    const ents = E.entregables.filter((d) => nums.includes(d.etapa));
+    const mapas = E.mapas.filter((m) => nums.includes(m.etapa));
+    const a = avanceDe(prods.map((p) => p.codigo).concat(ents.map((d) => 'D' + d.numero)));
+    const porQuien = { atlas: 0, calibrador: 0, equipo: 0 };
+    prods.forEach((p) => { porQuien[p.resuelve] = (porQuien[p.resuelve] || 0) + 1; });
+    const chips = ['calibrador', 'atlas', 'equipo']
+      .filter((q) => porQuien[q])
+      .map((q) => `<span class="et-quien ${q}">${porQuien[q]} ${ETIQUETA_QUIEN[q]}</span>`).join('');
+    return '<div class="et-resumen">' +
+      `<div class="et-kpi"><b>${a.pct}%</b><span>de estas etapas marcado</span>${barra(a)}</div>` +
+      `<div class="et-kpi"><b>${etapas.length}</b><span>etapa${etapas.length > 1 ? 's' : ''}</span></div>` +
+      (mapas.length ? `<div class="et-kpi"><b>${mapas.length}</b><span>mapas</span></div>` : '') +
+      (chips ? `<div class="et-kpi chips">${chips}</div>` : '') +
+      '</div>';
+  }
+
   function transversales() {
     if (!E.transversales || !E.transversales.length) return '';
     return '<section class="et-card plano"><h3 class="et-solo">Procesos transversales</h3>' +
@@ -301,47 +322,85 @@
         `<td>${esc(n.estado)}</td></tr>`).join('') + '</tbody></table></section>';
   }
 
+  /* ---------- vistas ----------
+     La misma estructura se muestra en varias secciones del calibrador, cada una con su
+     recorte de etapas. Se declara acá para no duplicar ni la lectura ni el pintado:
+       etapas   → el proceso completo, con resumen, transversales, normas y verificación
+       insumos  → lo que entra antes de la propuesta (etapas 1 a 5)
+       tramite  → lo que viene después (etapas 8 a 10)
+       audiencia→ solo la etapa 7, incrustada en la sección de Participación ciudadana */
+  const VISTAS = {
+    etapas: {
+      caja: 'v-etapas', nums: null, titulo: 'Etapas del Plan Regulador', completa: true
+    },
+    insumos: {
+      caja: 'v-insumos', nums: [1, 2, 3, 4, 5], titulo: 'Insumos del plan',
+      intro: 'Lo que tiene que estar listo antes de calibrar la propuesta: la preparación ' +
+        'preliminar, el mapa base, la evaluación ambiental, el diagnóstico y el pronóstico. ' +
+        'Casi todo lo resuelve el atlas o el equipo consultor; acá se lleva el avance.'
+    },
+    tramite: {
+      caja: 'v-tramite', nums: [8, 9, 10], titulo: 'Trámite y adopción',
+      intro: 'Lo que sigue después de la audiencia pública: la revisión del INVU, la ' +
+        'adopción por el Concejo con su publicación en La Gaceta, y el seguimiento posterior.'
+    },
+    audiencia: {
+      caja: 'et-audiencia', nums: [7], titulo: null
+    }
+  };
+
   // ---------- pintado ----------
-  function render() {
-    const caja = $('v-etapas');
+  function render(id) {
+    const vista = VISTAS[id] || VISTAS.etapas;
+    const caja = $(vista.caja);
     if (!caja) return;
+    const h2 = vista.titulo ? `<h2>${esc(vista.titulo)}</h2>` : '';
 
     if (!E && !pedida) {
-      caja.innerHTML = '<div class="card"><h2>Etapas del Plan Regulador</h2>' +
+      caja.innerHTML = '<div class="card">' + h2 +
         '<p class="hint">Leyendo la estructura compartida del Plan Regulador…</p></div>';
       return;
     }
 
     if (!E) {
-      caja.innerHTML = '<div class="card et-error"><h2>Etapas del Plan Regulador</h2>' +
+      caja.innerHTML = '<div class="card et-error">' + h2 +
         '<p>No se pudo leer la estructura compartida del Plan Regulador' +
         (error ? ' (' + esc(error) + ')' : '') + '.</p>' +
         '<p class="hint">La estructura vive en planoexactocr.com y la comparten este ' +
         'calibrador y el atlas. Si no carga, puede ser que no haya conexión o que el ' +
         'sitio esté publicándose en este momento.</p>' +
-        '<button class="btn primary" id="etReintentar">Volver a intentar</button></div>';
-      const b = $('etReintentar');
-      if (b) b.onclick = async () => { await cargar(); render(); };
+        `<button class="btn primary" data-reintentar="${esc(id || 'etapas')}">Volver a intentar</button></div>`;
+      const b = caja.querySelector('[data-reintentar]');
+      if (b) b.onclick = async () => { await cargar(); render(id); };
       return;
     }
 
-    caja.innerHTML =
-      '<div class="card et-cab">' +
-        '<h2>Etapas del Plan Regulador</h2>' +
-        `<p class="hint">${esc(E.nota)} Fuente: ${esc(E.fuente)}.</p>` +
-        resumen() +
-        '<p class="hint et-pie">El avance se guarda en este navegador y es del plan, no de ' +
-        'un escenario: cambiar de escenario calibrado no lo mueve. La estructura se lee de ' +
-        'planoexactocr.com cada vez, para que una corrección en la norma llegue sola.</p>' +
-      '</div>' +
-      E.etapas.map(tarjetaEtapa).join('') +
-      transversales() + normas() + verificar();
+    const etapas = vista.nums
+      ? E.etapas.filter((e) => vista.nums.includes(e.numero))
+      : E.etapas;
+
+    const cabecera = vista.completa
+      ? '<div class="card et-cab">' + h2 +
+          `<p class="hint">${esc(E.nota)} Fuente: ${esc(E.fuente)}.</p>` +
+          resumen() +
+          '<p class="hint et-pie">El avance se guarda en este navegador y es del plan, no de ' +
+          'un escenario: cambiar de escenario calibrado no lo mueve. La estructura se lee de ' +
+          'planoexactocr.com cada vez, para que una corrección en la norma llegue sola.</p>' +
+        '</div>'
+      : (vista.titulo
+          ? '<div class="card et-cab">' + h2 +
+            (vista.intro ? `<p class="hint">${esc(vista.intro)}</p>` : '') +
+            avanceDeVista(etapas) + '</div>'
+          : '');
+
+    caja.innerHTML = cabecera + etapas.map(tarjetaEtapa).join('') +
+      (vista.completa ? transversales() + normas() + verificar() : '');
 
     caja.querySelectorAll('[data-abrir]').forEach((h) => {
       const abrir = () => {
         const n = Number(h.dataset.abrir);
         abiertas[n] = !abiertas[n];
-        render();
+        render(id);
       };
       h.addEventListener('click', (ev) => {
         if (ev.target.closest('input,button,a,label')) return;
@@ -356,13 +415,13 @@
         ev.stopPropagation();
         const n = Number(b.dataset.mapas);
         mostrarMapas[n] = !mostrarMapas[n];
-        render();
+        render(id);
       });
     });
     caja.querySelectorAll('[data-prod]').forEach((c) => {
       c.addEventListener('change', () => {
         marcar(c.dataset.prod, c.checked);
-        render();
+        render(id);
       });
     });
     if (window.lucide && window.lucide.createIcons) window.lucide.createIcons();
@@ -370,7 +429,10 @@
 
   window.ETAPAS = {
     async init() { await cargar(); },
+    // render('etapas' | 'insumos' | 'tramite' | 'audiencia'); sin argumento, el proceso completo.
     render,
+    // La estructura leída, para que otros módulos (participación) no la vuelvan a pedir.
+    estructura() { return E; },
     // Para las pruebas: inyectar una estructura sin salir a la red.
     _usar(d) { E = d; error = d ? null : 'inyectada vacía'; }
   };

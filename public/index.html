@@ -8,6 +8,7 @@
 <link href="fonts/fonts.css" rel="stylesheet">
 <link href="reglamentos/reglamentos.css" rel="stylesheet">
 <link href="etapas/etapas.css" rel="stylesheet">
+<link href="participacion/participacion.css" rel="stylesheet">
 <style>
 /* Institutional layout: navy masthead with step tabs; one zone x perilla matrix seen four ways (Perillas, Calibrar, Prácticas y divisa, Ficha). Transect colors are data, not chrome. */
 :root{
@@ -58,6 +59,13 @@ h1,h2,h3{margin:0;text-wrap:balance;letter-spacing:-0.01em}
 .step .n{width:20px;height:20px;border-radius:50%;border:1.5px solid currentColor;display:grid;place-items:center;font-size:11px}
 .step[aria-selected="true"]{color:#fff;border-bottom-color:#fff}
 .step[aria-selected="true"] .n{background:#fff;color:var(--navy);border-color:#fff}
+/* Segunda fila: las herramientas dentro de Propuesta. Va más discreta que la fila del
+   proceso, para que se lea como un nivel abajo y no como otra barra principal. */
+.steps.sub{background:rgba(0,0,0,.16);border-top:1px solid rgba(255,255,255,.08);padding:0 4px}
+.steps.sub[hidden]{display:none}
+.steps.sub .step{padding:7px 13px 8px;font-size:13px;font-weight:600;color:rgba(255,255,255,.6);border-bottom-width:2px}
+.steps.sub .step .ic{width:15px;height:15px}
+.steps.sub .step[aria-selected="true"]{color:#fff;border-bottom-color:var(--gold)}
 
 .wrap{max-width:1500px;margin:0 auto;padding:18px 20px 40px;display:flex;flex-direction:column;gap:14px}
 .view{display:none;flex-direction:column;gap:14px}
@@ -366,15 +374,23 @@ svg.ch rect[data-tip]:hover,svg.ch path[data-tip]:hover{filter:brightness(1.12)}
       <input id="cantonOther" type="text" placeholder="Nombre del cantón" aria-label="Otro cantón" style="display:none;width:170px">
       <button class="mbtn" id="zonesBtn" title="Agregar o quitar zonas y sectores"><i data-lucide="layers-3" class="ic"></i>Zonas del transecto</button>
     </div>
-    <nav class="steps" role="tablist" aria-label="Pasos">
-      <button class="step" role="tab" id="tab-etapas"><i data-lucide="route" class="ic"></i>1 · Etapas del PR</button>
-      <button class="step" role="tab" id="tab-perillas"><i data-lucide="book-open" class="ic"></i>2 · Perillas</button>
-      <button class="step" role="tab" id="tab-calibrar"><i data-lucide="sliders-horizontal" class="ic"></i>3 · Calibrar</button>
-      <button class="step" role="tab" id="tab-practicas"><i data-lucide="coins" class="ic"></i>4 · Prácticas incentivables</button>
-      <button class="step" role="tab" id="tab-ficha"><i data-lucide="file-text" class="ic"></i>5 · Ficha del transecto</button>
-      <button class="step" role="tab" id="tab-graficos"><i data-lucide="chart-column" class="ic"></i>6 · Gráficos</button>
-      <button class="step" role="tab" id="tab-glosario"><i data-lucide="book-a" class="ic"></i>7 · Glosario</button>
-      <button class="step" role="tab" id="tab-reglamentos"><i data-lucide="scroll-text" class="ic"></i>8 · Reglamentos</button>
+    <!-- Navegación en dos niveles: arriba el proceso del Plan Regulador, y al entrar en
+         Propuesta, la segunda fila con las herramientas de calibración. -->
+    <nav class="steps" role="tablist" aria-label="Proceso del Plan Regulador">
+      <button class="step" role="tab" id="nav-etapas"><i data-lucide="route" class="ic"></i>Etapas del PR</button>
+      <button class="step" role="tab" id="nav-insumos"><i data-lucide="database" class="ic"></i>Insumos</button>
+      <button class="step" role="tab" id="nav-propuesta"><i data-lucide="sliders-horizontal" class="ic"></i>Propuesta</button>
+      <button class="step" role="tab" id="nav-participacion"><i data-lucide="users" class="ic"></i>Participación</button>
+      <button class="step" role="tab" id="nav-tramite"><i data-lucide="stamp" class="ic"></i>Trámite</button>
+      <button class="step" role="tab" id="nav-glosario"><i data-lucide="book-a" class="ic"></i>Glosario</button>
+    </nav>
+    <nav class="steps sub" role="tablist" aria-label="Herramientas de la propuesta" id="subbar">
+      <button class="step" role="tab" id="tab-perillas"><i data-lucide="book-open" class="ic"></i>1 · Perillas</button>
+      <button class="step" role="tab" id="tab-calibrar"><i data-lucide="sliders-horizontal" class="ic"></i>2 · Calibrar</button>
+      <button class="step" role="tab" id="tab-practicas"><i data-lucide="coins" class="ic"></i>3 · Prácticas incentivables</button>
+      <button class="step" role="tab" id="tab-ficha"><i data-lucide="file-text" class="ic"></i>4 · Ficha del transecto</button>
+      <button class="step" role="tab" id="tab-graficos"><i data-lucide="chart-column" class="ic"></i>5 · Gráficos</button>
+      <button class="step" role="tab" id="tab-reglamentos"><i data-lucide="scroll-text" class="ic"></i>6 · Reglamentos</button>
     </nav>
   </div>
 </header>
@@ -389,11 +405,18 @@ svg.ch rect[data-tip]:hover,svg.ch path[data-tip]:hover{filter:brightness(1.12)}
 
   <div class="zlegend" id="zlegend" aria-label="Zonas del transecto"></div>
 
-  <!-- 1 · Etapas del Plan Regulador. El contenido lo pinta etapas/etapas.js a partir de la
+  <!-- Etapas del Plan Regulador. El contenido lo pinta etapas/etapas.js a partir de la
        estructura compartida con el atlas (planoexactocr.com/data/estructura_pr.json). -->
   <section class="view" id="v-etapas" aria-label="Etapas del Plan Regulador"></section>
 
-  <!-- 2 -->
+  <!-- Insumos (etapas 1 a 5) y Trámite (etapas 8 a 10): los pinta el mismo etapas.js,
+       filtrando qué etapas muestra cada uno. La etapa 7 (Audiencia Pública) la pinta
+       participacion/participacion.js dentro de su propia sección. -->
+  <section class="view" id="v-insumos" aria-label="Insumos del plan"></section>
+  <section class="view" id="v-participacion" aria-label="Participación ciudadana"></section>
+  <section class="view" id="v-tramite" aria-label="Trámite y adopción"></section>
+
+  <!-- Propuesta · 1 -->
   <section class="view" id="v-perillas" aria-label="Lámina de perillas">
     <div class="card">
       <h2 style="margin-bottom:10px"><i data-lucide="database" class="ic" style="color:var(--accent);margin-right:4px"></i>Datos del cantón</h2>
@@ -501,8 +524,8 @@ svg.ch rect[data-tip]:hover,svg.ch path[data-tip]:hover{filter:brightness(1.12)}
   <section class="view" id="v-glosario" aria-label="Glosario">
     <div class="card">
       <div class="bar" style="justify-content:space-between;align-items:flex-start">
-        <div><h2 style="font-size:18px"><i data-lucide="book-a" class="ic" style="width:20px;height:20px;color:var(--accent);margin-right:6px"></i>Glosario de términos y fórmulas</h2>
-          <p class="lead">Definiciones de los conceptos del sistema y las fórmulas con que se calculan resultados y alertas. Los códigos remiten a la perilla correspondiente.</p></div>
+        <div><h2 style="font-size:18px"><i data-lucide="book-a" class="ic" style="width:20px;height:20px;color:var(--accent);margin-right:6px"></i>Glosario del Plan Regulador</h2>
+          <p class="lead">Glosario general del proceso: los términos de las etapas, el trámite y la participación, más los conceptos y fórmulas del sistema de perillas. Los códigos remiten a la perilla correspondiente.</p></div>
         <input id="gq" type="search" placeholder="Buscar término o fórmula" aria-label="Buscar en el glosario" style="width:240px">
       </div>
       <div class="chips" id="gcats" role="group" aria-label="Filtrar por tema" style="margin-top:10px"></div>
@@ -588,6 +611,7 @@ svg.ch rect[data-tip]:hover,svg.ch path[data-tip]:hover{filter:brightness(1.12)}
 <script src="reglamentos/textos.js"></script>
 <script src="reglamentos/motor.js"></script>
 <script src="etapas/etapas.js"></script>
+<script src="participacion/participacion.js"></script>
 
 <script>
 (function(){
@@ -836,9 +860,23 @@ const usoInit=(r,z)=>{ const b=tplOf(z); return b==='T0'?'N':b==='ZE'?'_':(r[7][
 function freshUsos(){ const o={}; USOS.r.forEach(r=>{ o[r[0]]={}; ZID.forEach(z=>o[r[0]][z]=usoInit(r,z)); }); return o; }
 function normUsos(u){ if(!u) return freshUsos(); const order=BASE_ZONES.map(z=>z.id); const o={}; USOS.r.forEach(r=>{ const x=u[r[0]]; o[r[0]]={}; ZID.forEach(z=>{ let c; if(typeof x==='string'){ const i=order.indexOf(z); c=i>=0?x[i]:undefined; } else if(x) c=x[z]; o[r[0]][z]=c||usoInit(r,z); }); }); return o; }
 function freshPract(){ return {list:JSON.parse(JSON.stringify(PRACT_DEF)),ruleAB:true,sim:{zone:'T5',lot:600,zru:false,qty:{I1:2,I2:0,I3:0,I4:1,I5:0,I6:1,I7:1,I8:1,I9:0,I10:0,H1:0,H2:0,H3:0,H4:0,H5:0}}}; }
-let S={zonas:[],tool:'PRT',values:freshValues(),datos:freshDatos(),pract:freshPract(),usos:freshUsos(),usosOpen:false,ug:'',uq:'',udesc:false,view:'calibrar',hidden:{},lamFilter:null,onlyDef:false,q:'',onlyNum:false,shade:true};
+let S={zonas:[],tool:'PRT',values:freshValues(),datos:freshDatos(),pract:freshPract(),usos:freshUsos(),usosOpen:false,ug:'',uq:'',udesc:false,nav:'propuesta',view:'calibrar',hidden:{},lamFilter:null,onlyDef:false,q:'',onlyNum:false,shade:true};
 let store={scenarios:{},current:null};
-try{ const r=JSON.parse(localStorage.getItem(LS)||'null'); if(r){ if(r.store) store=r.store; if(r.S&&r.S.values&&r.S.values.ZE) S=Object.assign(S,r.S); } }catch(e){}
+try{
+  const r=JSON.parse(localStorage.getItem(LS)||'null');
+  if(r){
+    if(r.store) store=r.store;
+    if(r.S&&r.S.values&&r.S.values.ZE){
+      /* Antes la barra era plana y «etapas» y «glosario» eran pestañas como las demás,
+         guardadas en S.view. Ahora son secciones del proceso (S.nav). A quien venía de esa
+         versión se le respeta dónde estaba, en vez de dejarlo caer en Calibrar sin aviso.
+         Se mira el estado guardado, no el ya mezclado: el valor por defecto de S.nav
+         taparía la ausencia. */
+      if(!r.S.nav) r.S.nav=(r.S.view==='etapas'||r.S.view==='glosario')?r.S.view:'propuesta';
+      S=Object.assign(S,r.S);
+    }
+  }
+}catch(e){}
 rebuildZones(S.zonas||[]); S.usos=normUsos(S.usos); ensureZoneData();
 function ensureZoneData(){ ZONES.forEach(z=>{ if(!S.values[z.id]){ const t=S.values[tplOf(z.id)]||{}; S.values[z.id]=JSON.parse(JSON.stringify(t)); S.values[z.id].A01=z.name; S.values[z.id].A03=z.strat; S.values[z.id].A02=z.fam==='T'?'Transecto':'Sector '+z.fam; } if(S.datos.area[z.id]==null) S.datos.area[z.id]=0; if(S.datos.vias[z.id]==null) S.datos.vias[z.id]=S.datos.vias[tplOf(z.id)]||0; }); }
 function save(){ try{ localStorage.setItem(LS,JSON.stringify({store,S})); }catch(e){} }
@@ -932,18 +970,46 @@ function renderGlobal(){
   $('globalTxt').textContent=n?`${n} alerta${n>1?'s':''}`:'Transecto coherente';
   $('hdrCanton').textContent=`${S.datos.canton||'Cantón sin nombre'}${provOf(S.datos.canton)?', '+provOf(S.datos.canton):''} · Plan regulador territorial · valores precargados: supuestos de partida`;
 }
-const VIEWS=['etapas','perillas','calibrar','practicas','ficha','graficos','glosario','reglamentos'];
-/* La tira de zonas del transecto solo sirve donde se calibran zonas. En las pestañas que
-   no hablan de zonas (etapas, glosario, reglamentos) ocupaba media pantalla antes de que
-   empezara el contenido, así que ahí se esconde. */
-const SIN_TIRA = ['etapas','glosario','reglamentos'];
-function setView(v){
-  S.view=v; VIEWS.forEach(x=>{ $('tab-'+x).setAttribute('aria-selected',x===v); $('v-'+x).classList.toggle('show',x===v); });
-  $('zlegend').hidden = SIN_TIRA.includes(v);
-  ({etapas:()=>{ if(window.ETAPAS) ETAPAS.render(); },perillas:renderLamina,calibrar:renderCalibrar,practicas:renderPracticas,ficha:renderFicha,graficos:renderGraficos,glosario:renderGlosario,reglamentos:()=>{ if(window.REG) REG.render(); }})[v]();
+/* ===== Navegación en dos niveles =====
+   NAV son las secciones del proceso del Plan Regulador (la barra de arriba). TOOLS son las
+   herramientas de calibración, que viven todas dentro de «Propuesta» (segunda fila).
+   S.nav guarda en cuál sección se está; S.view, cuál herramienta de la propuesta. */
+const NAV=['etapas','insumos','propuesta','participacion','tramite','glosario'];
+const TOOLS=['perillas','calibrar','practicas','ficha','graficos','reglamentos'];
+/* La tira de zonas del transecto solo sirve donde se calibran zonas: en el resto ocupaba
+   media pantalla antes de que empezara el contenido. */
+const CON_TIRA=['perillas','calibrar','practicas','ficha','graficos'];
+const PINTA={
+  etapas:()=>{ if(window.ETAPAS) ETAPAS.render('etapas'); },
+  insumos:()=>{ if(window.ETAPAS) ETAPAS.render('insumos'); },
+  tramite:()=>{ if(window.ETAPAS) ETAPAS.render('tramite'); },
+  participacion:()=>{ if(window.PART) PART.render(); },
+  glosario:renderGlosario,
+  perillas:renderLamina, calibrar:renderCalibrar, practicas:renderPracticas,
+  ficha:renderFicha, graficos:renderGraficos,
+  reglamentos:()=>{ if(window.REG) REG.render(); }
+};
+/* Vuelve a pintar lo que esté abierto. Se llama sola al cambiar de sección y también
+   cuando cambian los datos (zonas, escenario, reinicio), para no duplicar ese trabajo. */
+function apply(){
+  const k=NAV.includes(S.nav)?S.nav:'propuesta';
+  const v=TOOLS.includes(S.view)?S.view:'calibrar';
+  S.nav=k; S.view=v;
+  const activa = k==='propuesta' ? v : k;
+  NAV.forEach(x=>$('nav-'+x).setAttribute('aria-selected',x===k));
+  TOOLS.forEach(x=>$('tab-'+x).setAttribute('aria-selected',x===activa));
+  $('subbar').hidden = k!=='propuesta';
+  NAV.filter(x=>x!=='propuesta').concat(TOOLS).forEach(x=>$('v-'+x).classList.toggle('show',x===activa));
+  $('zlegend').hidden = !CON_TIRA.includes(activa);
+  PINTA[activa]();
   renderGlobal(); save();
 }
-VIEWS.forEach(x=>$('tab-'+x).addEventListener('click',()=>setView(x)));
+function setNav(k){ S.nav=k; apply(); }
+/* Selecciona una herramienta de la propuesta. Si se llama desde otra sección (por ejemplo
+   un enlace «se hace acá» de las etapas), también mueve la barra de arriba a Propuesta. */
+function setView(v){ if(TOOLS.includes(v)) S.nav='propuesta'; S.view=v; apply(); }
+NAV.forEach(x=>$('nav-'+x).addEventListener('click',()=>setNav(x)));
+TOOLS.forEach(x=>$('tab-'+x).addEventListener('click',()=>setView(x)));
 
 // ===== 1. lámina =====
 function renderLamina(){
@@ -1111,7 +1177,7 @@ function afterChange(keepFocus){
     if(keepFocus&&sel){ const n=document.querySelector(sel); if(n) n.focus({preventScroll:true}); }
   }
 }
-$('resetBtn').addEventListener('click',()=>{ S.zonas=[]; rebuildZones([]); S.values=freshValues(); S.datos=freshDatos(); S.pract=freshPract(); S.usos=freshUsos(); renderLegend(); store.current=null; renderScenarios(); setView(S.view); toast('Valores de partida restablecidos'); });
+$('resetBtn').addEventListener('click',()=>{ S.zonas=[]; rebuildZones([]); S.values=freshValues(); S.datos=freshDatos(); S.pract=freshPract(); S.usos=freshUsos(); renderLegend(); store.current=null; renderScenarios(); apply(); toast('Valores de partida restablecidos'); });
 $('copySheet').addEventListener('click',async()=>{
   const rows=[['Código','Parámetro',...ZID].join('\t')];
   P.forEach(p=>rows.push([p.code,p.name,...ZID.map(z=>{ if(!applies(p,z)) return 'No aplica'; if(USO_CODES[p.code]) return usoCount(z,USO_CODES[p.code])+' usos'; const v=V(z,p.code); return v==null?'':String(v); })].join('\t')));
@@ -1306,12 +1372,12 @@ $('scenarioSel').addEventListener('change',e=>{
   const n=e.target.value; store.current=n||null;
   if(n){ const s=JSON.parse(JSON.stringify(store.scenarios[n])); S.zonas=s.zonas||[]; rebuildZones(S.zonas); S.values=s.values; S.datos=s.datos; S.pract=s.pract||freshPract(); S.usos=normUsos(s.usos); S.regs=s.regs||{}; ensureZoneData(); } else { S.zonas=[]; rebuildZones([]); S.values=freshValues(); S.datos=freshDatos(); S.pract=freshPract(); S.usos=freshUsos(); }
   renderLegend();
-  $('scenarioName').value=n||''; renderScenarios(); setView(S.view);
+  $('scenarioName').value=n||''; renderScenarios(); apply();
 });
 $('saveBtn').addEventListener('click',()=>{
   const n=$('scenarioName').value.trim()||store.current;
   if(!n){ toast('Escribe un nombre para el escenario'); $('scenarioName').focus(); return; }
-  store.scenarios[n]=snap(); store.current=n; save(); renderScenarios(); setView(S.view); toast('Escenario guardado en este navegador');
+  store.scenarios[n]=snap(); store.current=n; save(); renderScenarios(); apply(); toast('Escenario guardado en este navegador');
 });
 $('delBtn').addEventListener('click',()=>{ if(!store.current) return; delete store.scenarios[store.current]; store.current=null; save(); renderScenarios(); toast('Escenario borrado'); });
 function openIO(t){ $('ioPanel').classList.add('show'); $('io').value=t; $('io').focus(); $('io').select(); }
@@ -1322,7 +1388,7 @@ $('ioImport').addEventListener('click',()=>{
   try{ const o=JSON.parse($('io').value); if(!o.values||!o.values.T1||!o.datos) throw 0;
     S.zonas=o.zonas||[]; rebuildZones(S.zonas); S.values=o.values; S.datos=o.datos; S.pract=o.pract||freshPract(); S.usos=normUsos(o.usos); S.regs=o.regs||{}; ensureZoneData(); renderLegend();
     const n=(o.escenario&&o.escenario!=='Valores de partida')?o.escenario:'Importado';
-    store.scenarios[n]=snap(); store.current=n; save(); renderScenarios(); setView(S.view);
+    store.scenarios[n]=snap(); store.current=n; save(); renderScenarios(); apply();
     $('ioPanel').classList.remove('show'); toast('Escenario importado');
   }catch(e){ toast('El texto no es un escenario válido'); }
 });
@@ -1419,7 +1485,36 @@ const GLOS=[
  ['SENARA','Siglas','Servicio Nacional de Aguas Subterráneas, Riego y Avenamiento.',null,null],
  ['SETENA','Siglas','Secretaría Técnica Nacional Ambiental.',null,null],
  ['SINAC','Siglas','Sistema Nacional de Áreas de Conservación.',null,null],
- ['ZMT','Siglas','Zona marítimo terrestre (Ley 6043).',null,null]
+ ['ZMT','Siglas','Zona marítimo terrestre (Ley 6043).',null,null],
+ /* Proceso del Plan Regulador. El glosario no es solo de las perillas: acompaña todo el
+    proceso, así que acá entran los términos de las etapas, el trámite y la participación,
+    que son los que aparecen en las demás secciones. */
+ ['Plan Regulador','Proceso del plan regulador','Instrumento de planificación del territorio de un cantón: fija el uso del suelo, la vialidad y los reglamentos de desarrollo urbano. Lo dicta la Municipalidad conforme a la Ley de Planificación Urbana N.º 4240.',null,null],
+ ['Área de Planificación','Proceso del plan regulador','Porción del cantón que cubre el plan. Puede ser todo el cantón o una parte delimitada, y es la unidad sobre la que se arman el mapa base y el diagnóstico.',null,null],
+ ['Comisión del Plan Regulador','Proceso del plan regulador','Grupo designado por el Concejo Municipal que acompaña y da seguimiento al proceso. Integra al Concejo, la Alcaldía, técnicos municipales y representación comunal.',null,null],
+ ['Términos de Referencia (TdR)','Proceso del plan regulador','Documento que define qué se contrata: alcance, productos, plazos y perfil del equipo planificador. Es la pieza que amarra todo lo demás del proceso.',null,null],
+ ['Equipo Planificador','Proceso del plan regulador','Equipo técnico interdisciplinario que elabora el plan. Lidera el mapa base, el diagnóstico, el pronóstico y la propuesta.',null,null],
+ ['Mapa Base','Proceso del plan regulador','Cartografía oficial sobre la que se construye todo el plan: límites, curvas de nivel, hidrografía, red vial, catastro y nombres de lugares. Sin él no se puede diagnosticar ni proponer.',null,null],
+ ['Diagnóstico territorial','Proceso del plan regulador','Etapa que describe el territorio como está hoy: población, actividades, infraestructura, ambiente y conflictos de uso. Cierra con su documento y su mapa unificado.',null,null],
+ ['Pronóstico territorial','Proceso del plan regulador','Etapa que proyecta hacia dónde va el territorio y plantea escenarios. Cierra eligiendo el modelo territorial que la propuesta va a desarrollar.',null,null],
+ ['Escenario tendencial','Proceso del plan regulador','Lo que pasaría si nada cambia: se proyecta la tendencia actual sin intervención del plan. Es la línea contra la que se comparan los otros escenarios.',null,null],
+ ['Escenario deseable','Proceso del plan regulador','El territorio al que se quiere llegar, construido con la comunidad y sin la restricción de lo que hoy es viable.',null,null],
+ ['Escenario posible','Proceso del plan regulador','El acuerdo entre lo deseable y lo que de verdad se puede lograr con los recursos, las competencias y los plazos existentes. Suele ser el que adopta la propuesta.',null,null],
+ ['Modelo territorial','Proceso del plan regulador','Imagen objetivo del cantón que el plan busca construir: dónde crece, dónde se conserva y cómo se conecta. De él se desprende la zonificación.',null,null],
+ ['Política de Desarrollo Urbano','Proceso del plan regulador','Documento de la etapa de propuesta que fija los objetivos y las líneas de acción del plan. Es el marco al que responden los reglamentos.',null,null],
+ ['EsIVA','Proceso del plan regulador','Estudio de Índices de Fragilidad Ambiental integrado. Es la evaluación ambiental estratégica del plan ante SETENA, e incorpora el IFA al ordenamiento propuesto.',null,null],
+ ['Viabilidad ambiental','Proceso del plan regulador','Resolución de SETENA que habilita ambientalmente la propuesta. Llega con condicionantes que el plan tiene que gestionar en sus reglamentos.',null,null],
+ ['Condicionante ambiental','Proceso del plan regulador','Obligación que impone la resolución ambiental y que el plan debe trasladar a una norma concreta: un artículo de reglamento, un parámetro o un control en el trámite.',null,null],
+ ['Audiencia Pública','Proceso del plan regulador','Acto formal del artículo 17 de la Ley 4240 donde la propuesta se expone y se reciben observaciones. Cierra con acta, registro de observaciones y matriz de respuestas.',null,null],
+ ['Matriz de respuestas','Proceso del plan regulador','Documento que recoge cada observación recibida en la audiencia con la respuesta de la Municipalidad y si se acogió, se acogió en parte o no se acogió.',null,null],
+ ['Participación ciudadana','Proceso del plan regulador','Proceso continuo que atraviesa todas las etapas con talleres y consultas, no solo la audiencia final. Así la entiende el MAPRIOT 2025.',null,null],
+ ['Consulta indígena','Proceso del plan regulador','Consulta obligatoria cuando el Área de Planificación toca territorios indígenas. Tiene sus propias reglas y plazos, distintos de la audiencia pública.',null,null],
+ ['Ventanilla Única','Proceso del plan regulador','Vía por la que el INVU recibe y revisa el expediente del plan, contrastándolo con la matriz de criterios mínimos del artículo 16.',null,null],
+ ['Revisión por etapas','Proceso del plan regulador','Acompañamiento del INVU durante la elaboración: adelanta observaciones etapa por etapa para que no aparezcan todas juntas en el trámite formal.',null,null],
+ ['Mapa Oficial','Proceso del plan regulador','Mapa que registra los terrenos y edificios de dominio público del cantón: vías, parques, facilidades comunales y áreas por adquirir. Tiene su propio reglamento.',null,null],
+ ['Adopción','Proceso del plan regulador','Acuerdo del Concejo Municipal que aprueba el plan una vez que el INVU dio su visto bueno. Entra en vigencia con su publicación en La Gaceta.',null,null],
+ ['La Gaceta','Proceso del plan regulador','Diario oficial de Costa Rica. La publicación del acuerdo de adopción es lo que le da vigencia al plan regulador.',null,null],
+ ['Seguimiento y evaluación','Proceso del plan regulador','Etapa posterior a la vigencia: medir cómo se está aplicando el plan y con qué resultados. Se recomienda revisarlo cada cinco años.',null,null]
 ];
 const LOGP=new Set(['C01','C04','B05']);
 const INCMAX={D03:'D08',C04:'C09'};
@@ -1502,7 +1597,7 @@ function renderGraficos(){
 })();
 
 // ===== glosario =====
-const GCAT_IC={'Transecto y zonas':'route','Estructura del sistema':'grid-2x2','Parámetros urbanísticos':'ruler','Usos del suelo':'layers','Prácticas incentivables':'coins','Instrumentos de gestión':'scale','Resultados y fórmulas':'calculator','Alertas de coherencia':'triangle-alert','Siglas':'type'};
+const GCAT_IC={'Proceso del plan regulador':'route','Transecto y zonas':'milestone','Estructura del sistema':'grid-2x2','Parámetros urbanísticos':'ruler','Usos del suelo':'layers','Prácticas incentivables':'coins','Instrumentos de gestión':'scale','Resultados y fórmulas':'calculator','Alertas de coherencia':'triangle-alert','Siglas':'type'};
 function glosRef(r){
   if(!r) return '';
   if(r==='ZONES') return zchips(ZID);
@@ -1589,7 +1684,7 @@ function removeZone(id){
   delete S.values[id]; delete S.datos.area[id]; delete S.datos.vias[id]; for(const k in S.usos) if(S.usos[k]) delete S.usos[k][id];
   rebuildZones(S.zonas);
 }
-function zonesChanged(msg){ save(); renderLegend(); renderZList(); setView(S.view); if(msg) toast(msg); }
+function zonesChanged(msg){ save(); renderLegend(); renderZList(); apply(); if(msg) toast(msg); }
 function renderZList(){
   $('zList').innerHTML=ZONES.map(z=>`<div class="zrow"><span class="sw" style="background:${z.color}">${z.id}</span><div class="grow"><b>${esc(z.name)}</b><span class="hint">${esc(z.strat)} · ${z.base?'zona base':`hereda de ${z.tpl} · ${z.grad?'en el gradiente':'fuera del gradiente'}`}</span></div>${z.base?'':`<button class="btn" data-zdel="${z.id}" title="Quitar ${z.id}">${ic('trash-2')}Quitar</button>`}</div>`).join('');
   $('zList').querySelectorAll('[data-zdel]').forEach(b=>b.onclick=()=>{ const id=b.dataset.zdel; if(b.dataset.armed!=='1'){ b.dataset.armed='1'; b.innerHTML=`${ic('triangle-alert')}Confirmar`; return; } removeZone(id); zonesChanged(`Zona ${id} quitada`); });
@@ -1859,14 +1954,14 @@ if(STANDALONE&&window.LZString){
     }catch(e){ setTimeout(()=>toast('El enlace no trae un escenario válido'),400); }
   }
 }
-window.CAL={get S(){return S},get ZONES(){return ZONES},get ZID(){return ZID},get ZBY(){return ZBY},get store(){return store},P,PBY,NUM,TXT,BLOQUES,BIDX,USOS,USO_CODES,DERIVED,V,applies,tplOf,nf,esc,ic,chip,zchips,results,totals,usoCount,save,toast,copyText,isInc,incz,setView,provOf};
+window.CAL={get S(){return S},get ZONES(){return ZONES},get ZID(){return ZID},get ZBY(){return ZBY},get store(){return store},P,PBY,NUM,TXT,BLOQUES,BIDX,USOS,USO_CODES,DERIVED,V,applies,tplOf,nf,esc,ic,chip,zchips,results,totals,usoCount,save,toast,copyText,isInc,incz,setView,setNav,provOf};
 window.__buildBooklet=buildBooklet; window.__preload=preloadPdfIcons;
 
-renderCanton(); renderLegend(); renderScenarios(); setView(S.view||'calibrar');
+renderCanton(); renderLegend(); renderScenarios(); apply();
 /* La estructura del Plan Regulador se pide al mundo público (la comparten este calibrador y
    el atlas). Se pide sin bloquear el arranque: cuando llega, si la pestaña de etapas está
    abierta se vuelve a pintar sola. */
-if(window.ETAPAS) ETAPAS.init().then(()=>{ if(S.view==='etapas') ETAPAS.render(); });
+if(window.ETAPAS) ETAPAS.init().then(()=>{ if(['etapas','insumos','tramite','participacion'].includes(S.nav)) apply(); });
 syncZoneBarScroll();
 // Keep --mast-h in sync so sticky zone bar positions correctly
 function updateMastH(){

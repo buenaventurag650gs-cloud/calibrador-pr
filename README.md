@@ -6,12 +6,14 @@ No necesita servidor ni base de datos: todo corre en el navegador y los escenari
 ## Contenido
 
 - `public/index.html` — la herramienta.
-- `public/etapas/etapas.js` — **pestaña 1, Etapas del PR**: el proceso completo del plan regulador.
-- `public/etapas/etapas.css` — estilos de esa pestaña.
+- `public/etapas/etapas.js` — el proceso del plan regulador. Sirve tres secciones con el mismo código: **Etapas del PR** (todo), **Insumos** (etapas 1 a 5) y **Trámite** (8 a 10).
+- `public/etapas/etapas.css` — estilos de esas secciones.
+- `public/participacion/participacion.js` — **Participación ciudadana**: los momentos de participación por etapa, la audiencia pública y la matriz de respuestas.
+- `public/participacion/participacion.css` — estilos de esa sección.
 - `scripts/probar_etapas.mjs` — pruebas de la pestaña de etapas en un navegador simulado (necesita `npm install jsdom`).
 - `public/reglamentos/textos.js` — **texto base de los reglamentos** (aquí se cargan los borradores).
 - `public/reglamentos/motor.js` — conecta el texto con las perillas, el editor y la descarga en Word.
-- `public/reglamentos/reglamentos.css` — estilos de la pestaña Reglamentos.
+- `public/reglamentos/reglamentos.css` — estilos de la sección Reglamentos.
 - `public/vendor/` — librerías incluidas (íconos Lucide, jsPDF, jsPDF-AutoTable, lz-string). No depende de CDN externos.
 - `public/fonts/` — tipografía Public Sans incluida.
 - `public/escudos.json` — escudos municipales de los 82 cantones (cantón → URL en el CDN de munis.cr). Lo usa la portada del PDF.
@@ -54,7 +56,33 @@ Para que solo el equipo o la municipalidad la vean: Cloudflare **Zero Trust → 
 
 En el proyecto de Cloudflare: **Settings → Domains & Routes → Add custom domain** (por ejemplo `calibrador.tudominio.com`).
 
-## Etapas del Plan Regulador (pestaña 1)
+## Cómo está organizada
+
+La barra de arriba sigue el proceso de elaboración de un plan regulador, no una lista de herramientas. Son seis secciones:
+
+| Sección | Qué trae | Etapas del proceso |
+| --- | --- | --- |
+| **Etapas del PR** | El proceso completo con su avance, los procesos transversales, el marco normativo y los puntos a verificar antes de firmar unos TdR. | 1 a 10 |
+| **Insumos** | Lo que tiene que estar listo antes de calibrar: preparación, mapa base, evaluación ambiental, diagnóstico y pronóstico. Casi todo lo resuelve el atlas o el equipo; acá se lleva el avance. | 1 a 5 |
+| **Propuesta** | Las herramientas de calibración, en una segunda fila: Perillas, Calibrar, Prácticas incentivables, Ficha del transecto, Gráficos y Reglamentos. | 6 |
+| **Participación** | Los momentos de participación etapa por etapa, la audiencia pública del art. 17 y la matriz de respuestas a las observaciones. | transversal + 7 |
+| **Trámite** | Revisión del INVU, adopción por el Concejo con publicación en La Gaceta, y seguimiento. | 8 a 10 |
+| **Glosario** | Glosario general del proceso: términos de las etapas, el trámite y la participación, más los conceptos y fórmulas del sistema de perillas. | — |
+
+Dos detalles de implementación que conviene saber:
+
+- **Insumos y Trámite no son módulos aparte.** Son la misma estructura de `etapas.js` con otro recorte de etapas (ver `VISTAS` en ese archivo). Así, una corrección en la norma llega a las tres secciones a la vez.
+- **El avance es del plan, no del escenario.** El avance de las etapas (`S.etapas`) y el de participación (`S.pc`) quedan fuera del escenario a propósito: un mismo plan puede tener varios escenarios calibrados, y cambiar de escenario no debe mover la lista de pendientes ni las observaciones recibidas.
+
+### Participación ciudadana
+
+La estructura compartida la declara como proceso transversal: «talleres por etapa; el MAPRIOT 2025 la trata como proceso continuo, no solo como la audiencia final». Por eso la sección tiene las dos cosas:
+
+- **Momentos de participación por etapa.** Ocho momentos, de mapear actores en la preparación a rendir cuentas en el seguimiento, cada uno con qué busca y qué deja por escrito. Ojo: esto es **guía de trabajo, no norma**. El MAPRIOT fija el principio de participación continua pero no una lista cerrada de talleres; cada cantón arma los suyos. Está dicho así en pantalla para que nadie lo cite como obligación legal.
+- **Audiencia Pública (art. 17 Ley 4240).** Es la etapa 7 y se lee de la estructura compartida, así que si cambia la norma cambia sola.
+- **Matriz de respuestas.** Tabla editable con cada observación recibida, la respuesta de la Municipalidad y si se acogió, se acogió en parte o no. Se copia con un botón para pegarla en el expediente que va al INVU.
+
+## Etapas del Plan Regulador
 
 Desde cada mapa del índice maestro, el botón **abrir atlas** lleva a
 `atlas.planoexactocr.com/?canton=…&mapa=…`: el atlas elige ese cantón y abre ese mapa. Si el
@@ -94,7 +122,7 @@ tocan a esta herramienta.
 El avance marcado se guarda en el navegador y es **del plan, no de un escenario**: cambiar de
 escenario calibrado no mueve la lista de pendientes.
 
-## Reglamentos (pestaña 8)
+## Reglamentos (dentro de Propuesta)
 
 Cada reglamento del plan (00 Generalidades a 09 Audiencia Pública) tiene un borrador cuyo texto está **conectado a las perillas**: al calibrar, los artículos y tablas se actualizan solos.
 

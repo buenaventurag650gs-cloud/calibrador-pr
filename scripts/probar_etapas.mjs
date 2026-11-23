@@ -91,14 +91,19 @@ const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // ---------- 1. la pestaña existe y está declarada ----------
 const html = lee('index.html');
-afirmar(/id="tab-etapas"/.test(html), 'la pestaña "Etapas del PR" está en la barra de pasos');
+afirmar(/id="nav-etapas"/.test(html), 'la sección "Etapas del PR" está en la barra del proceso');
 afirmar(/id="v-etapas"/.test(html), 'existe el panel v-etapas');
-afirmar(/VIEWS=\['etapas',/.test(html), 'etapas es la primera vista del recorrido');
+afirmar(/NAV=\['etapas',/.test(html), 'etapas abre el recorrido del proceso');
+afirmar(/id="v-insumos"/.test(html) && /id="v-tramite"/.test(html),
+  'insumos y trámite tienen su propio panel, servidos por el mismo módulo');
 afirmar(/etapas\/etapas\.js/.test(html) && /etapas\/etapas\.css/.test(html),
   'index.html carga el módulo de etapas y sus estilos');
 afirmar(/ETAPAS\.init\(\)/.test(html), 'la estructura se pide al arrancar');
-afirmar(/etapas:\(\)=>\{ if\(window\.ETAPAS\) ETAPAS\.render\(\); \}/.test(html),
-  'al abrir la pestaña se pinta el módulo');
+afirmar(/etapas:\(\)=>\{ if\(window\.ETAPAS\) ETAPAS\.render\('etapas'\); \}/.test(html),
+  'al abrir la sección se pinta el módulo');
+afirmar(/insumos:\(\)=>\{ if\(window\.ETAPAS\) ETAPAS\.render\('insumos'\); \}/.test(html)
+  && /tramite:\(\)=>\{ if\(window\.ETAPAS\) ETAPAS\.render\('tramite'\); \}/.test(html),
+  'insumos y trámite reusan el módulo de etapas con su recorte');
 
 // ---------- 2. la estructura viene del mundo público, no de una copia ----------
 const js = lee('etapas/etapas.js');
@@ -211,9 +216,10 @@ afirmar(texto().includes('sin hito de pago'),
 /* La tira de zonas del transecto no pinta nada en esta pestaña y ocupaba media pantalla
    antes de que empezara el contenido. */
 const htmlCal = lee('index.html');
-afirmar(/SIN_TIRA\s*=\s*\[[^\]]*'etapas'/.test(htmlCal)
-  && /\$\('zlegend'\)\.hidden\s*=\s*SIN_TIRA/.test(htmlCal),
-  'la tira de zonas se esconde al entrar a la pestaña de etapas');
+afirmar(/CON_TIRA\s*=\s*\[[^\]]*\]/.test(htmlCal)
+  && !/CON_TIRA\s*=\s*\[[^\]]*'etapas'/.test(htmlCal)
+  && /\$\('zlegend'\)\.hidden\s*=\s*!CON_TIRA/.test(htmlCal),
+  'la tira de zonas se esconde al entrar a la sección de etapas');
 afirmar(/\.zlegend\[hidden\]\s*\{\s*display:\s*none/.test(htmlCal),
   'la regla de ocultar la tira le gana al display:grid, que si no la dejaría visible');
 // Los textos que se leen de corrido no bajan de 11,5 px; los distintivos sí pueden.
@@ -242,7 +248,7 @@ afirmar(texto().includes('Puntos a verificar') && texto().includes('Anexo 1'),
   const t2 = m2.w.document.getElementById('v-etapas').textContent;
   afirmar(t2.includes('No se pudo leer la estructura compartida'),
     'sin estructura avisa en lugar de quedarse en blanco');
-  afirmar(!!m2.w.document.getElementById('etReintentar'),
+  afirmar(!!m2.w.document.querySelector('[data-reintentar]'),
     'sin estructura ofrece volver a intentar');
   afirmar(t2.includes('503'), 'sin estructura dice por qué falló');
 }

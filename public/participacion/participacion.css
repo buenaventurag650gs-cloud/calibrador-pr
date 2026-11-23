@@ -1,0 +1,64 @@
+/* ===== Participación ciudadana ===== */
+.pc-cab h2{font-size:19px;margin:0 0 6px}
+.pc-cab .hint{max-width:78ch}
+.pc-pie{margin-top:12px;font-size:12px}
+.pc-resumen{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.pc-kpi{flex:1 1 150px;min-width:140px;border:1px solid var(--line);border-radius:10px;
+  padding:10px 12px;background:var(--bg);display:flex;flex-direction:column;gap:2px}
+.pc-kpi b{font-size:20px;line-height:1.1;color:var(--navy)}
+:root[data-theme="dark"] .pc-kpi b{color:var(--ink)}
+.pc-kpi span{font-size:11.5px;color:var(--muted)}
+.pc-prog{height:5px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:6px}
+.pc-prog>span{display:block;height:100%;background:var(--accent);border-radius:3px}
+
+.pc-sec{margin-top:14px}
+.pc-sec h3{font-size:15px;margin:0 0 4px;color:var(--navy)}
+:root[data-theme="dark"] .pc-sec h3{color:var(--ink)}
+.pc-sec .hint{max-width:80ch;margin:0 0 12px}
+
+.pc-tabla{width:100%;border-collapse:collapse;font-size:13px}
+.pc-tabla th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--muted);font-weight:700;padding:6px 8px;border-bottom:1px solid var(--line);
+  white-space:nowrap}
+.pc-tabla td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.pc-tabla tbody tr:last-child td{border-bottom:none}
+.pc-tabla tr.hecho{background:color-mix(in srgb,var(--ok) 6%,transparent)}
+.pc-tabla tr.hecho .pc-tit{text-decoration:line-through;text-decoration-color:var(--muted)}
+.pc-check{width:30px}
+.pc-check input{width:16px;height:16px;cursor:pointer}
+.pc-cod{width:74px;white-space:nowrap}
+.pc-cod label{font-weight:700;font-size:12px;color:var(--accent);cursor:pointer}
+.pc-etapa{display:block;font-size:10.5px;color:var(--muted);margin-top:2px}
+.pc-tit{font-weight:700;margin-bottom:3px}
+.pc-busca{color:var(--ink);margin-bottom:4px}
+.pc-deja{font-size:12px;color:var(--muted)}
+.pc-momento{width:140px;font-size:12px;color:var(--muted)}
+
+/* matriz de observaciones */
+.pc-tw{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+.pc-tabla.matriz{min-width:900px}
+.pc-tabla.matriz th{background:var(--bg);padding:8px}
+.pc-tabla.matriz td{padding:6px}
+.pc-n{width:30px;color:var(--muted);font-size:12px;text-align:center;padding-top:12px!important}
+.pc-in{width:100%;border:1px solid transparent;border-radius:6px;padding:5px 7px;
+  background:transparent;font:inherit;font-size:12.5px;color:var(--ink)}
+.pc-in:hover{border-color:var(--line)}
+.pc-in:focus{border-color:var(--accent);background:var(--surface);outline:none}
+.pc-ta{resize:vertical;min-height:38px;line-height:1.4}
+.pc-sel{border:1px solid var(--line);border-radius:6px;padding:5px;background:var(--surface);
+  font:inherit;font-size:12px;color:var(--ink)}
+.pc-del{width:34px;text-align:center}
+.pc-del .ib{font-size:15px;line-height:1;padding:3px 8px;color:var(--muted)}
+.pc-del .ib:hover{color:var(--crit);border-color:var(--crit)}
+.pc-vacia td{color:var(--muted);font-size:12.5px;text-align:center;padding:18px 8px}
+/* El estado tiñe la fila: de un vistazo se ve qué falta responder. */
+.pc-tabla.matriz tr.est-acogida{background:color-mix(in srgb,var(--ok) 7%,transparent)}
+.pc-tabla.matriz tr.est-parcial{background:color-mix(in srgb,var(--gold) 9%,transparent)}
+.pc-tabla.matriz tr.est-no-acogida{background:color-mix(in srgb,var(--crit) 6%,transparent)}
+
+/* En pantalla angosta se cae la columna «Cuándo» de los talleres: el momento ya va dicho en
+   el código de la fila (etapa N). La matriz no se toca, que para eso lleva scroll propio. */
+@media (max-width:760px){
+  .pc-momento,
+  .pc-tabla:not(.matriz) th:last-child{display:none}
+}
