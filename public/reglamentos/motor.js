@@ -34,6 +34,23 @@ const NOMBRES={'00':'Generalidades','01':'Zonificación','02':'Fraccionamiento y
    Devuelve la imagen ya en base64 para que entre al PDF sin pelear con CORS ni hotlink.
    Es del Calibrador, no del atlas, para no depender de los permisos de otra aplicación. */
 const ESCUDOS_API='/api/escudos';
+/* Guionado correcto del texto justificado del PDF.
+   html2canvas dibuja el texto con su propio motor de líneas, no con el del navegador, así que
+   ignora el guionado automático real (CSS hyphens:auto) y puede partir una palabra en cualquier
+   punto. La solución es marcar a mano, antes de dibujar, dónde SÍ se puede partir cada palabra
+   —según las sílabas del español, con los patrones de Liang/TeX— insertando un guion blando
+   (U+00AD) ahí; ese caracter si lo respeta el motor de líneas de html2canvas. Se usa solo para
+   el PDF: en pantalla el navegador ya guiona bien por sí solo. */
+let hyphenateEs=null;
+function hyph(html){
+  try{
+    if(!hyphenateEs){
+      if(!(window.createHyphenator&&window.hyphenationPatternsEs)) return html;
+      hyphenateEs=window.createHyphenator(window.hyphenationPatternsEs,{html:true});
+    }
+    return hyphenateEs(html);
+  }catch(e){ return html; }
+}
 /* Isotipo de PlanoExactoCR (trazos vectoriales, sin red) para el pie de la portada del PDF. */
 const PE_LOGO_SVG='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 322.39 256.00"><g transform="translate(161.195,128.000) scale(2.38589) translate(-0.000,-0.000)"><path d="M0.000,41.913 L55.826,14.000 L43.503,7.839 L35.677,11.752 L40.174,14.000 L0.000,34.087 L-40.174,14.000 L-35.677,11.752 L-43.503,7.839 L-55.826,14.000 Z" fill="#073B32"/><path d="M0.000,27.913 L55.826,0.000 L43.503,-6.161 L35.677,-2.248 L40.174,0.000 L0.000,20.087 L-40.174,0.000 L-35.677,-2.248 L-43.503,-6.161 L-55.826,0.000 Z" fill="#159B75"/><path d="M-55.826,-14.000 L0.000,13.913 L55.826,-14.000 L0.000,-41.913 Z M40.174,-14.000 L0.000,6.087 L-40.174,-14.000 L0.000,-34.087 Z" fill="#073B32"/></g></svg>';
 
@@ -261,7 +278,7 @@ function tableHTML(b){
 }
 function blocksHTML(blocks){
   return blocks.map(b=>{
-    if(b.k==='cap') return `<h3 class="rg-cap"><span>Capítulo ${b.n}</span>${esc(b.t)}</h3>`;
+    if(b.k==='cap') return `<h3 class="rg-cap" data-ci="${b.ci}"><span>Capítulo ${b.n}</span>${esc(b.t)}</h3>`;
     if(b.k==='art') return `<h4 class="rg-art" id="art-${esc(b.id)}${b.z?'-'+b.z:''}">Artículo ${b.n}. ${esc(b.t)}</h4>`;
     if(b.k==='p') return `<p class="rg-p${b.li?' li':''}">${b.runs.map(runHTML).join('')}</p>`;
     if(b.k==='tbl') return tableHTML(b);
@@ -612,6 +629,74 @@ function buildCoverHTML(s,B,escudoImg){
   </div>`;
 }
 
+/* ---------- Índice y subportadas de capítulo ---------- */
+/* Agrupa una lista de elementos (hijos de un host sin paginar) en páginas, cortando siempre
+   entre bloques y nunca a la mitad de uno. Se usa tanto para el cuerpo del reglamento como
+   para el índice, para que ambos paginen con la misma regla. */
+/* breakBefore(el), si se pasa, fuerza un grupo nuevo justo antes de ese elemento aunque
+   todavía quepa en la página actual — se usa para que cada capítulo arranque su propia
+   página (y así, delante, le entre su subportada) en vez de seguir pegado al anterior. */
+function groupByHeight(children,pageHpxCSS,breakBefore){
+  const pages=[[]]; let pageStart=0;
+  children.forEach(el=>{
+    const top=el.offsetTop, bottom=top+el.offsetHeight;
+    const forzar=breakBefore&&breakBefore(el)&&pages[pages.length-1].length;
+    if(forzar||(pages[pages.length-1].length && (bottom-pageStart)>pageHpxCSS)){ pages.push([]); pageStart=top; }
+    pages[pages.length-1].push(el);
+  });
+  return pages;
+}
+/* Cuántas páginas de PDF va a ocupar un grupo, antes de dibujarlo. Un grupo de varios bloques
+   siempre cabe en una página (así quedó armado por groupByHeight); uno de un solo bloque más
+   alto que la página —una tabla larga— se reparte, igual que hace addCanvas al dibujarlo. */
+function predictPages(group,pageHpxCSS){
+  if(group.length===1) return Math.max(1,Math.ceil(group[0].offsetHeight/pageHpxCSS));
+  return 1;
+}
+function buildIndexHTML(reg){
+  const head=`<div class="rg-idx-head"><h2>Índice</h2><p class="hint">Clic en un capítulo para ir directo a esa página.</p></div>`;
+  const rows=reg.caps.map((cap,ci)=>
+    `<div class="rg-idx-row" data-ci="${ci}"><span class="rg-idx-n">${ROM[ci+1]||ci+1}</span>`+
+    `<span class="rg-idx-t">${esc(cap.t)}</span><span class="rg-idx-pg" data-pg="${ci}"></span></div>`
+  ).join('');
+  return head+rows;
+}
+/* Subportada de capítulo: lleva el nombre al corredor de aire del municipio. Si existe una
+   foto de dron para este cantón y este capítulo, la usa de fondo; si no, deja un marcador
+   limpio en su lugar (no hay que rehacer el PDF cuando la foto aparezca: basta con subirla
+   a esa ruta y el próximo PDF la toma sola). */
+function slugCanton(s){
+  return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+}
+const FOTO_CACHE={};
+function rutaFotoCapitulo(canton,regId,ci){ return `/fotos/${slugCanton(canton)}/${regId}-cap-${ci+1}.jpg`; }
+async function fotoCapitulo(canton,regId,ci){
+  const key=canton+'|'+regId+'|'+ci;
+  if(key in FOTO_CACHE) return FOTO_CACHE[key];
+  const url=rutaFotoCapitulo(canton,regId,ci);
+  let ok=false;
+  try{
+    const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),4000);
+    const r=await fetch(url,{method:'HEAD',signal:ctrl.signal});
+    clearTimeout(t);
+    ok=r.ok;
+  }catch(e){ ok=false; }
+  FOTO_CACHE[key]=ok?url:null;
+  return FOTO_CACHE[key];
+}
+function buildSubHTML(cap,ci,fotoUrl){
+  const foto=fotoUrl
+    ? `<img class="rg-sub-photo" src="${esc(fotoUrl)}" alt="">`
+    : `<div class="rg-sub-ph">Foto aérea pendiente<br>para este capítulo</div>`;
+  return `<div class="rg-sub">${foto}<div class="rg-sub-shade"></div>
+    <div class="rg-sub-body">
+      <div class="rg-sub-n">Capítulo ${ROM[ci+1]||ci+1}</div>
+      <div class="rg-sub-t">${esc(cap.t)}</div>
+    </div>
+  </div>`;
+}
+
 /* ---------- aviso de progreso ----------
    Armar el PDF de un reglamento largo toma su rato (cada página se dibuja aparte), y un
    botón girando no dice si algo está pasando o si se colgó. Este aviso muestra el paso real
@@ -686,6 +771,7 @@ async function downloadPdf(){
   const pageW=215.9, pageH=279.4, margin=12;
   const contentWmm=pageW-margin*2;
   const pxPerMM=(CSSW*SCALE)/contentWmm;
+  const cssPxPerMM=CSSW/contentWmm; // para ubicar los enlaces del índice (sin el SCALE del canvas)
   const pageHpxCSS=(pageH-margin*2)*(CSSW/contentWmm); // alto de página en css px, sin escalar
   // El PDF siempre es claro, sin importar el tema de la pantalla: se fuerza mientras se genera.
   const root=document.documentElement, prevTheme=root.getAttribute('data-theme');
@@ -717,46 +803,96 @@ async function downloadPdf(){
   };
   const av=avisoProgreso(`Reglamento ${s.regSel} · ${NOMBRES[s.regSel]}`);
   try{
+    // La búsqueda de fotos de dron (una por capítulo) tarda lo suyo y no depende de nada más,
+    // así que arranca ya mismo, en paralelo, y se recoge más adelante cuando hace falta.
+    const fotosP=Promise.all(B.reg.caps.map((cap,ci)=>fotoCapitulo(s.datos.canton,s.regSel,ci)));
     await av.paso('Buscando el escudo de la municipalidad…',4,FRASES[0]);
     const escudoImg=await fetchEscudo(s.datos.canton);
-    await av.paso(escudoImg?'Escudo encontrado: va a la portada':'Sin escudo en la base: la portada sigue igual',8);
+    await av.paso(escudoImg?'Escudo encontrado: va a la portada':'Sin escudo en la base: la portada sigue igual',7);
     const coverHost=mkHost();
     coverHost.style.height=pageHpxCSS+'px';
-    coverHost.innerHTML=buildCoverHTML(s,B,escudoImg);
-    const head=`<header class="rg-head"><div class="ey">Plan Regulador del cantón de ${esc(s.datos.canton||'')}</div><h2>${esc(B.reg.t)}</h2>${B.reg.fuente?`<p class="hint">${esc(B.reg.fuente)}</p>`:''}</header>`;
+    coverHost.innerHTML=hyph(buildCoverHTML(s,B,escudoImg));
     const host=mkHost();
-    host.innerHTML=head+blocksHTML(B.blocks);
+    // el reglamento ya no abre con un encabezado corrido propio: ese dato (cantón + título)
+    // vive en la portada y ahora también arriba del índice, así ninguna página de contenido
+    // queda huérfana con solo ese rótulo antes de la primera subportada.
+    host.innerHTML=hyph(blocksHTML(B.blocks));
     document.body.appendChild(host);
+    const head=`<header class="rg-head"><div class="ey">Plan Regulador del cantón de ${esc(s.datos.canton||'')}</div><h2>${esc(B.reg.t)}</h2>${B.reg.fuente?`<p class="hint">${esc(B.reg.fuente)}</p>`:''}</header>`;
+    const idxHost=mkHost();
+    idxHost.innerHTML=hyph(head)+buildIndexHTML(B.reg);
+    document.body.appendChild(idxHost);
     c.refreshIcons&&c.refreshIcons();
-    await av.paso('Midiendo dónde cae cada corte de página…',12,FRASES[1]);
+    await av.paso('Midiendo dónde cae cada corte de página…',10,FRASES[1]);
     await new Promise(r=>setTimeout(r,60));
-    // agrupar los hijos del documento en páginas, cortando entre bloques (nunca a mitad de una tabla o un párrafo).
-    // se usa offsetTop (no la suma de offsetHeight) porque los márgenes entre bloques colapsan en el flujo original.
-    const kids=Array.from(host.children);
-    const pages=[[]]; let pageStart=0;
-    kids.forEach(el=>{
-      const top=el.offsetTop, bottom=top+el.offsetHeight;
-      if(pages[pages.length-1].length && (bottom-pageStart)>pageHpxCSS){ pages.push([]); pageStart=top; }
-      pages[pages.length-1].push(el);
+    // agrupar los hijos del documento (y del índice) en páginas, cortando entre bloques
+    // (nunca a mitad de una tabla o un párrafo). offsetTop, no la suma de offsetHeight, porque
+    // los márgenes entre bloques colapsan en el flujo original.
+    const contentPages=groupByHeight(Array.from(host.children),pageHpxCSS,el=>el.classList.contains('rg-cap'));
+    const idxPages=groupByHeight(Array.from(idxHost.children),pageHpxCSS);
+    const IDX=idxPages.filter(p=>p.length).length||1;
+    // intercala, antes del primer grupo de cada capítulo, el paso de su subportada
+    const plan=[];
+    contentPages.forEach(grp=>{
+      if(!grp.length) return;
+      const first=grp[0];
+      if(first.classList&&first.classList.contains('rg-cap')) plan.push({tipo:'sub',ci:+first.dataset.ci});
+      plan.push({tipo:'cont',grupo:grp});
     });
-    /* Los bloques son el trabajo real (cada uno se dibuja aparte), así que el porcentaje se
-       mide sobre ellos. El número de páginas es una estimación: un bloque más alto que la
-       página —una tabla larga— se reparte en varias, así que puede salir alguna de más. Por
-       eso se anuncia como estimación y al final se dice el número de verdad. */
-    const bloques=pages.filter(p=>p.length).length, estimadas=bloques+1; // +1 por la portada
+    /* Página real de cada capítulo (a dónde salta el índice) y número total de páginas: una
+       pasada "en seco" sobre el plan, sin dibujar nada todavía. Un bloque más alto que una
+       página —una tabla larga— se reparte en varias; por eso addCanvas puede dar alguna
+       página más de la prevista, y el total final sigue siendo una estimación hasta el cierre. */
+    let cursor=1+IDX; // 1 = portada
+    const capPagina={};
+    plan.forEach(paso=>{
+      if(paso.tipo==='sub'){ cursor++; capPagina[paso.ci]=cursor; }
+      else cursor+=predictPages(paso.grupo,pageHpxCSS);
+    });
+    const estimadas=cursor;
+    idxHost.querySelectorAll('.rg-idx-pg').forEach(sp=>{
+      const n=capPagina[+sp.dataset.pg];
+      sp.textContent=n!=null?'pág. '+n:'';
+    });
     const {jsPDF}=window.jspdf; const doc=new jsPDF({unit:'mm',format:'letter',orientation:'portrait'});
-    await av.paso(`Serán unas ${estimadas} páginas. Dibujando la portada…`,15,'Sellando la portada con el escudo');
+    await av.paso(`Serán unas ${estimadas} páginas. Dibujando la portada…`,13,'Sellando la portada con el escudo');
     const coverCanvas=await renderPage(coverHost);
     addCanvas(doc,coverCanvas,true);
+    await av.paso('Dibujando el índice…',16,'Numerando los capítulos');
+    for(const grupo of idxPages){
+      if(!grupo.length) continue;
+      if(av.cancelado){ c.toast('Generación cancelada'); return; }
+      const pageHost=mkHost();
+      grupo.forEach(el=>pageHost.appendChild(el.cloneNode(true)));
+      const canvas=await renderPage(pageHost);
+      addCanvas(doc,canvas,false);
+      // los enlaces del índice se agregan sobre la página que acaba de quedar activa en el PDF
+      pageHost.querySelectorAll('.rg-idx-row[data-ci]').forEach(row=>{
+        const destino=capPagina[+row.dataset.ci]; if(destino==null) return;
+        const mmY=margin+row.offsetTop/cssPxPerMM, mmH=row.offsetHeight/cssPxPerMM;
+        doc.link(margin,mmY,contentWmm,mmH,{pageNumber:destino});
+      });
+    }
+    const fotos=await fotosP;
     let i=0;
-    for(const chunk of pages){
-      if(!chunk.length) continue;
+    for(const paso of plan){
       if(av.cancelado) { c.toast('Generación cancelada'); return; }
+      if(paso.tipo==='sub'){
+        const cap=B.reg.caps[paso.ci];
+        await av.paso(`Abriendo el capítulo ${ROM[paso.ci+1]||paso.ci+1}…`,15+(80*(doc.getNumberOfPages())/estimadas),
+          fotos[paso.ci]?'Vistiendo la subportada con la foto aérea':'Dejando lista la subportada del capítulo');
+        const subHost=mkHost();
+        subHost.style.height=pageHpxCSS+'px';
+        subHost.innerHTML=hyph(buildSubHTML(cap,paso.ci,fotos[paso.ci]));
+        const canvas=await renderPage(subHost);
+        addCanvas(doc,canvas,false);
+        continue;
+      }
       i++;
       // de 15 % a 95 %: el tramo largo es dibujar las páginas, que es lo que de verdad tarda
       await av.paso(`Dibujando la página ${doc.getNumberOfPages()+1}…`,15+(80*i/estimadas),FRASES[(i-1)%FRASES.length]);
       const pageHost=mkHost();
-      chunk.forEach(el=>pageHost.appendChild(el.cloneNode(true)));
+      paso.grupo.forEach(el=>pageHost.appendChild(el.cloneNode(true)));
       const canvas=await renderPage(pageHost);
       addCanvas(doc,canvas,false);
     }

@@ -152,6 +152,13 @@
 .rg-pdf-render .rg-tbl tbody tr:nth-child(even) td{background:#f6f8fb}
 .rg-pdf-render .rpd,.rg-pdf-render .rg-tbl td.pd{background:#fdecea!important;color:var(--crit)}
 .rg-pdf-render .rpc{background:#fff4b8!important;color:#6b5300}
+/* El guionado automático (hyphens:auto) de .rg-p queda bien en pantalla porque ahí dibuja el
+   navegador real, pero html2canvas no lo sigue correctamente (parte palabras donde no debe).
+   Para el PDF, motor.js inserta los puntos de corte a mano (guion blando U+00AD) con un
+   guionador propio en español, así que aquí basta con "manual": solo se parte donde ese
+   guion blando ya quedó puesto, nunca por cuenta propia de html2canvas. */
+.rg-pdf-render .rg-p,.rg-pdf-render .rg-cap,.rg-pdf-render .rg-art,
+.rg-pdf-render .rg-cover,.rg-pdf-render .rg-tbl{hyphens:manual}
 
 /* ---------- Portada ---------- */
 .rg-cover{position:relative;width:100%;height:100%;box-sizing:border-box;background:#fff;color:#1b2633;
@@ -160,12 +167,13 @@
 .rg-cover-top{height:10px;background:linear-gradient(90deg,#14304f,#1f4e79)}
 .rg-cover-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
   text-align:center;padding:40px 0}
-.rg-cover-escudo{width:148px;height:148px;display:flex;align-items:center;justify-content:center;
-  margin-bottom:22px}
+/* Escudo municipal a 2x (148px -> 296px): se notaba chico frente al resto de la portada. */
+.rg-cover-escudo{width:296px;height:296px;display:flex;align-items:center;justify-content:center;
+  margin-bottom:26px}
 .rg-cover-escudo img{max-width:100%;max-height:100%;object-fit:contain}
-.rg-cover-escudo.ph{width:148px;height:148px;border:2px solid #d7dde5;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;color:#586577;font-size:12px;
-  text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:22px}
+.rg-cover-escudo.ph{width:296px;height:296px;border:2px solid #d7dde5;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;color:#586577;font-size:14px;
+  text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:26px}
 .rg-cover-muni{font-size:15px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
   color:#14304f}
 .rg-cover-prov{font-size:13px;color:#586577;margin-top:6px}
@@ -180,6 +188,36 @@
 .rg-cover-foot{display:flex;align-items:center;justify-content:space-between;border-top:1px solid #d7dde5;
   padding-top:18px}
 .rg-cover-date{font-size:11.5px;color:#586577}
-.rg-cover-brand{display:flex;align-items:center;gap:8px;font-size:10.5px;color:#586577;
+.rg-cover-brand{display:flex;align-items:center;gap:10px;font-size:10.5px;color:#586577;
   text-transform:uppercase;letter-spacing:.06em;font-weight:700}
-.rg-cover-brand svg{height:16px;width:auto;display:block}
+/* Isotipo de PlanoExacto a 3x (16px -> 48px): quedaba demasiado discreto en el pie. */
+.rg-cover-brand svg{height:48px;width:auto;display:block}
+
+/* ---------- Índice del PDF (página propia, con filas clicables) ----------
+   El índice se arma, igual que el resto del cuerpo, como una fila de bloques sueltos (no un
+   contenedor único): así el mismo paginador por altura (groupByHeight) lo reparte en más de
+   una página cuando hay muchos capítulos. Por eso el padding horizontal va en cada bloque. */
+/* mismo padding horizontal que .rg-head (34px), para que el índice quede alineado con el
+   rótulo "Plan Regulador del cantón..." que va justo arriba. */
+.rg-idx-head{padding:22px 34px 0;background:#fff;color:#1b2633;
+  font-family:"Public Sans","Segoe UI",Roboto,Arial,sans-serif}
+.rg-idx-head h2{font-size:21px;color:#14304f;margin:0 0 4px}
+.rg-idx-head .hint{font-size:12.5px;color:#586577;margin:0 0 28px}
+.rg-idx-row{display:flex;align-items:baseline;gap:12px;padding:10px 34px;border-bottom:1px dotted #d7dde5;
+  background:#fff;color:#1b2633;font-family:"Public Sans","Segoe UI",Roboto,Arial,sans-serif}
+.rg-idx-n{font-size:12px;font-weight:800;color:#1f4e79;min-width:24px}
+.rg-idx-t{flex:1;font-size:13.5px;font-weight:600;color:#1b2633}
+.rg-idx-pg{font-size:12.5px;font-weight:700;color:#586577;font-variant-numeric:tabular-nums}
+
+/* ---------- Subportada de capítulo (con espacio para foto aérea) ---------- */
+.rg-sub{position:relative;width:100%;height:100%;box-sizing:border-box;display:flex;flex-direction:column;
+  justify-content:flex-end;background:#0e151e;color:#fff;overflow:hidden;
+  font-family:"Public Sans","Segoe UI",Roboto,Arial,sans-serif}
+.rg-sub-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.rg-sub-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  text-align:center;background:linear-gradient(160deg,#14304f,#0e151e);color:#8ea0b8;font-size:12.5px;
+  letter-spacing:.08em;text-transform:uppercase;font-weight:700}
+.rg-sub-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,21,30,0) 38%,rgba(14,21,30,.92) 100%)}
+.rg-sub-body{position:relative;padding:50px 54px;z-index:1}
+.rg-sub-n{font-size:12.5px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:#cfe3f6}
+.rg-sub-t{font-size:30px;font-weight:800;margin-top:10px;max-width:580px;line-height:1.22}

@@ -608,6 +608,11 @@ svg.ch rect[data-tip]:hover,svg.ch path[data-tip]:hover{filter:brightness(1.12)}
 <script src="vendor/jspdf-autotable-3.8.2.min.js"></script>
 <script src="vendor/lz-string-1.5.0.min.js"></script>
 <script src="vendor/html2canvas-1.4.1.min.js"></script>
+<!-- Guionado correcto en español para el PDF: html2canvas no sabe partir palabras por sílaba
+     (ver nota en motor.js), así que se insertan los puntos de corte a mano con estos patrones
+     Liang/TeX en español (vía la librería "hyphen", https://github.com/ytiurin/hyphen). -->
+<script src="vendor/hyphen-1.14.1.js"></script>
+<script src="vendor/hyphen-es-patterns-1.14.1.js"></script>
 <script src="reglamentos/textos.js"></script>
 <script src="reglamentos/motor.js"></script>
 <script src="etapas/etapas.js"></script>
