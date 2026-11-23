@@ -612,6 +612,70 @@ function buildCoverHTML(s,B,escudoImg){
   </div>`;
 }
 
+/* ---------- aviso de progreso ----------
+   Armar el PDF de un reglamento largo toma su rato (cada página se dibuja aparte), y un
+   botón girando no dice si algo está pasando o si se colgó. Este aviso muestra el paso real
+   —qué página va de cuántas— y, de paso, hace la espera menos tiesa. Las frases van atadas
+   a lo que de verdad está ocurriendo en ese momento, no son adorno suelto. */
+const FRASES=[
+  'Acomodando los artículos para que ninguno quede partido',
+  'Midiendo los márgenes a tamaño carta',
+  'Revisando que ninguna tabla quede huérfana',
+  'Poniendo cada valor donde el calibrador lo dejó',
+  'Pasando los capítulos a números romanos',
+  'Alineando las columnas de las zonas',
+  'Dejando respirar los encabezados',
+  'Ordenando los incisos a), b), c)…',
+  'Sacudiendo el polvo de los considerandos',
+  'Cuadrando el texto justificado'
+];
+
+function avisoProgreso(subtitulo){
+  const wrap=document.createElement('div');
+  wrap.className='modal show rg-prog';
+  wrap.innerHTML=`<div class="dlg">
+    <header><i data-lucide="file-text" class="ic" style="width:22px;height:22px"></i>
+      <div><h2>Armando el documento</h2>
+      <div class="rg-prog-sub">${esc(subtitulo)}</div></div></header>
+    <div class="bd">
+      <div class="rg-prog-bar"><span></span></div>
+      <p class="rg-prog-paso" role="status">Alistando…</p>
+      <p class="rg-prog-frase"></p>
+    </div>
+    <footer><span class="rg-prog-pct">0 %</span>
+      <button class="btn" data-cancelar>Cancelar</button></footer>
+  </div>`;
+  document.body.appendChild(wrap);
+  let cancelado=false;
+  wrap.querySelector('[data-cancelar]').onclick=()=>{
+    cancelado=true;
+    wrap.querySelector('.rg-prog-paso').textContent='Cancelando…';
+  };
+  if(window.lucide&&window.lucide.createIcons) window.lucide.createIcons();
+  const bar=wrap.querySelector('.rg-prog-bar>span');
+  const paso=wrap.querySelector('.rg-prog-paso');
+  const frase=wrap.querySelector('.rg-prog-frase');
+  const pct=wrap.querySelector('.rg-prog-pct');
+  return {
+    get cancelado(){ return cancelado; },
+    /* Devuelve una promesa que espera dos cuadros de pintado: sin eso el navegador no
+       alcanza a mostrar el paso nuevo antes de clavarse en el trabajo pesado que sigue. */
+    async paso(texto,p,f){
+      paso.textContent=texto;
+      if(f!=null){
+        frase.textContent=f;
+        /* La animación de entrada solo se dispara si se reinicia a mano: el elemento es
+           siempre el mismo, así que cambiarle el texto no la vuelve a lanzar. */
+        frase.style.animation='none'; void frase.offsetWidth; frase.style.animation='';
+      }
+      const v=Math.max(0,Math.min(100,Math.round(p)));
+      bar.style.width=v+'%'; pct.textContent=v+' %';
+      await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+    },
+    cerrar(){ wrap.remove(); }
+  };
+}
+
 /* ---------- PDF (html2canvas + jsPDF, portada + paginado por bloques) ---------- */
 async function downloadPdf(){
   const s=st(), c=C(), B=build(s.regSel); if(!B) return;
@@ -651,8 +715,11 @@ async function downloadPdf(){
       y+=sliceH;
     } while(y<canvas.height);
   };
+  const av=avisoProgreso(`Reglamento ${s.regSel} · ${NOMBRES[s.regSel]}`);
   try{
+    await av.paso('Buscando el escudo de la municipalidad…',4,FRASES[0]);
     const escudoImg=await fetchEscudo(s.datos.canton);
+    await av.paso(escudoImg?'Escudo encontrado: va a la portada':'Sin escudo en la base: la portada sigue igual',8);
     const coverHost=mkHost();
     coverHost.style.height=pageHpxCSS+'px';
     coverHost.innerHTML=buildCoverHTML(s,B,escudoImg);
@@ -661,6 +728,7 @@ async function downloadPdf(){
     host.innerHTML=head+blocksHTML(B.blocks);
     document.body.appendChild(host);
     c.refreshIcons&&c.refreshIcons();
+    await av.paso('Midiendo dónde cae cada corte de página…',12,FRASES[1]);
     await new Promise(r=>setTimeout(r,60));
     // agrupar los hijos del documento en páginas, cortando entre bloques (nunca a mitad de una tabla o un párrafo).
     // se usa offsetTop (no la suma de offsetHeight) porque los márgenes entre bloques colapsan en el flujo original.
@@ -671,21 +739,36 @@ async function downloadPdf(){
       if(pages[pages.length-1].length && (bottom-pageStart)>pageHpxCSS){ pages.push([]); pageStart=top; }
       pages[pages.length-1].push(el);
     });
+    /* Los bloques son el trabajo real (cada uno se dibuja aparte), así que el porcentaje se
+       mide sobre ellos. El número de páginas es una estimación: un bloque más alto que la
+       página —una tabla larga— se reparte en varias, así que puede salir alguna de más. Por
+       eso se anuncia como estimación y al final se dice el número de verdad. */
+    const bloques=pages.filter(p=>p.length).length, estimadas=bloques+1; // +1 por la portada
     const {jsPDF}=window.jspdf; const doc=new jsPDF({unit:'mm',format:'letter',orientation:'portrait'});
+    await av.paso(`Serán unas ${estimadas} páginas. Dibujando la portada…`,15,'Sellando la portada con el escudo');
     const coverCanvas=await renderPage(coverHost);
     addCanvas(doc,coverCanvas,true);
+    let i=0;
     for(const chunk of pages){
       if(!chunk.length) continue;
+      if(av.cancelado) { c.toast('Generación cancelada'); return; }
+      i++;
+      // de 15 % a 95 %: el tramo largo es dibujar las páginas, que es lo que de verdad tarda
+      await av.paso(`Dibujando la página ${doc.getNumberOfPages()+1}…`,15+(80*i/estimadas),FRASES[(i-1)%FRASES.length]);
       const pageHost=mkHost();
       chunk.forEach(el=>pageHost.appendChild(el.cloneNode(true)));
       const canvas=await renderPage(pageHost);
       addCanvas(doc,canvas,false);
     }
+    await av.paso('Cerrando el documento…',97,'Listo para firmar');
     const name=`PR_${(s.datos.canton||'canton').replace(/[^\wÁÉÍÓÚÑáéíóúñ]+/g,'_')}_-_${s.regSel}_${NOMBRES[s.regSel].replace(/\s+/g,'_')}.pdf`;
+    const paginas=doc.getNumberOfPages();
     doc.save(name);
-    c.toast('PDF descargado');
+    await av.paso(`${paginas} páginas listas`,100,'');
+    c.toast(`PDF descargado · ${paginas} páginas`);
   } catch(e){ c.toast('No se pudo generar el PDF'); }
   finally{
+    av.cerrar();
     renderHosts.forEach(h=>h.remove());
     if(prevTheme==null) root.removeAttribute('data-theme'); else root.setAttribute('data-theme',prevTheme);
     btn.disabled=false; btn.innerHTML=prevHTML; c.refreshIcons&&c.refreshIcons();

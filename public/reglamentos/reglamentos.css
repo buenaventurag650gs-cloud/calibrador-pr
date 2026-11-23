@@ -111,6 +111,27 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .rpd,:root:not([data-theme="light"]) .rg-tbl td.pd{background:#4a1d1a}:root:not([data-theme="light"]) .rpc{background:#4a4110;color:#ffe9a0}}
 :root[data-theme="dark"] .rpd,:root[data-theme="dark"] .rg-tbl td.pd{background:#4a1d1a}
 :root[data-theme="dark"] .rpc{background:#4a4110;color:#ffe9a0}
+/* ===== Aviso de progreso al armar el PDF ===== */
+/* Reusa .modal/.dlg del calibrador para que se vea como el resto de los diálogos. */
+.rg-prog .dlg{max-width:460px}
+.rg-prog-sub{font-size:12.5px;opacity:.85;margin-top:2px}
+.rg-prog-bar{height:8px;border-radius:5px;background:var(--line);overflow:hidden}
+.rg-prog-bar>span{display:block;height:100%;width:0;border-radius:5px;
+  background:linear-gradient(90deg,var(--accent),var(--navy));
+  transition:width .35s cubic-bezier(.4,0,.2,1)}
+:root[data-theme="dark"] .rg-prog-bar>span{background:linear-gradient(90deg,var(--accent),#cfe3f6)}
+.rg-prog-paso{margin:2px 0 0;font-weight:600;font-size:13.5px;color:var(--ink)}
+/* La frase suelta cambia en cada página: se desvanece al entrar para que el cambio no
+   pegue un brinco seco cada vez. */
+.rg-prog-frase{margin:0;font-size:12.5px;color:var(--muted);font-style:italic;min-height:1.3em;
+  animation:rgFrase .5s ease-out}
+@keyframes rgFrase{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+.rg-prog-pct{font-size:12.5px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){
+  .rg-prog-bar>span{transition:none}
+  .rg-prog-frase{animation:none}
+}
+
 /* ===== Exportar a PDF ===== */
 /* El render del PDF ocurre fuera de pantalla con html2canvas, que no entiende color-mix()
    y que no debe heredar el tema oscuro de la pantalla (el PDF siempre es claro, para imprimir).

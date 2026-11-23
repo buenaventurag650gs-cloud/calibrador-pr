@@ -129,7 +129,7 @@ Cada reglamento del plan (00 Generalidades a 09 Audiencia Pública) tiene un bor
 - **Ver resultado:** el texto final con los valores. Los valores en dorado fueron calibrados (distintos al de partida), en rojo están las perillas sin definir y en amarillo el texto por completar.
 - **Editar texto:** se puede cambiar la redacción, agregar o mover artículos y capítulos e insertar valores del calibrador. Los cambios se guardan en el navegador y viajan con el escenario.
 - **Descargar Word:** genera un .docx tamaño carta con tablas.
-- **Descargar PDF:** genera un PDF tamaño carta a partir de la misma vista de «Ver resultado» (usa `vendor/html2canvas` + `vendor/jspdf`, paginado por artículo/tabla para no cortarlos a la mitad). Lleva portada propia (ver abajo) y el PDF siempre sale en tema claro, sin importar el tema de la pantalla desde la que se genera.
+- **Descargar PDF:** genera un PDF tamaño carta a partir de la misma vista de «Ver resultado» (usa `vendor/html2canvas` + `vendor/jspdf`, paginado por artículo/tabla para no cortarlos a la mitad). Lleva portada propia (ver abajo) y el PDF siempre sale en tema claro, sin importar el tema de la pantalla desde la que se genera. Mientras se arma muestra un aviso con el paso real (qué página va), una barra de avance y un botón para cancelar: un reglamento largo toma su rato y un botón girando no dice si algo está pasando o si se colgó. El número de páginas que anuncia al empezar es una estimación —un bloque más alto que la página se reparte en varias—, así que al final informa el número de verdad.
 
 ### Portada del PDF
 
@@ -139,11 +139,13 @@ La primera página siempre es una portada: nombre de la municipalidad, escudo de
 - **Logo de PlanoExactoCR:** el isotipo va incrustado como SVG directo en `motor.js` (constante `PE_LOGO_SVG`), sin depender de red.
 - **Por qué una copia propia y no la del atlas:** el atlas de PlanoExactoCR tiene este mismo endpoint, pero está detrás de Cloudflare Access con su propia política. Una petición desde otro dominio no lleva la cookie de sesión de ese dominio, así que Access la intercepta y devuelve la pantalla de login en vez del escudo. Con el endpoint en el propio Worker la petición es del mismo origen y viaja con la sesión de Access que el usuario ya tiene abierta. La contra es que la base está duplicada: si se corrige un escudo hay que corregirlo en `public/escudos.json` de acá **y** en `muni/escudos.json` del atlas.
 
+El texto de los borradores es propio: lo redactó el equipo y acá se conecta a las perillas. El campo `fuente` de cada reglamento no es una atribución: se usa solo cuando hay una advertencia que dar sobre el contenido, y queda vacío cuando no hace falta.
+
 Estado de los borradores:
-- 01 Zonificación: adaptado del Reglamento de Zonificación y Forma Urbana de Liberia.
-- 02 Fraccionamiento y Urbanizaciones: adaptado del Reglamento de Fraccionamiento y Urbanización de Liberia.
-- 03 Mapa Oficial: adaptado del Reglamento de Mapa Oficial de Liberia. Las tablas de inventario (bienes públicos, vialidad, zonas de interés municipal) son propias de cada cantón y quedan como `[[ ]]` para incorporarlas como anexo.
-- 04 Renovación Urbana e Instrumentos de Gestión del Suelo: adaptado del reglamento homónimo de Liberia. El listado de proyectos de renovación urbana (RUA/RUV/RUU) es propio de cada cantón y queda como `[[ ]]`.
+- 01 Zonificación: redactado.
+- 02 Fraccionamiento y Urbanizaciones: redactado.
+- 03 Mapa Oficial: redactado. Las tablas de inventario (bienes públicos, vialidad, zonas de interés municipal) son propias de cada cantón y quedan como `[[ ]]` para incorporarlas como anexo.
+- 04 Renovación Urbana e Instrumentos de Gestión del Suelo: redactado. El listado de proyectos de renovación urbana (RUA/RUV/RUU) es propio de cada cantón y queda como `[[ ]]`.
 - Los demás: se puede crear un esqueleto desde las perillas mientras llega el texto base.
 
 Nota de estilo: desde noviembre 2026 la pestaña de Reglamentos tiene un diseño más moderno (tarjetas, barra lateral con insignias, tablas con cebra, reglas de color en encabezados). El host que arma `downloadPdf()` (clase `.rg-pdf-render` en `reglamentos.css`) fija su propia paleta clara —no hereda el tema oscuro de la pantalla— y reemplaza cada `color-mix()` por su color plano equivalente, porque `html2canvas` 1.4.1 no soporta ni el tema oscuro vía variables heredadas ni esa función CSS; sin esto el texto salía gris claro y las cajas oscuras eran ilegibles sobre el fondo blanco del PDF cuando se generaba desde una pantalla en modo oscuro.

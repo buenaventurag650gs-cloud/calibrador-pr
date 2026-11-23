@@ -1,13 +1,16 @@
 /* Borradores base de los reglamentos.
-   Cada reglamento: {id, t, fuente, caps:[{t, x?, arts:[{id, t, x, pz?}]}]}
+   Cada reglamento: {id, t, fuente?, caps:[{t, x?, arts:[{id, t, x, pz?}]}]}
    El formato del texto está explicado al inicio de motor.js.
-   01 Zonificación: adaptado del Reglamento de Zonificación y Forma Urbana del Plan Regulador de Liberia. */
+
+   El texto es propio: lo redactó el equipo y se conecta a las perillas del calibrador. El
+   campo `fuente` es opcional y NO es una atribución: solo se usa cuando hay una advertencia
+   que dar sobre el contenido (por ejemplo, que cierto inventario es propio de cada cantón).
+   No se escriben ahí créditos a planes de otros cantones. */
 window.REG_BASE = window.REG_BASE || {};
 
 window.REG_BASE['01'] = {
 id: '01',
 t: 'Reglamento de Zonificación y Forma Urbana',
-fuente: 'Borrador adaptado del Reglamento de Zonificación y Forma Urbana del Plan Regulador de Liberia. Los valores salen del calibrador.',
 caps: [
 { t: 'Disposiciones generales',
   x: `Que la Municipalidad de {{canton}}, reconociendo la necesidad de reglamentar el uso del suelo y la infraestructura en su jurisdicción, dicta el presente Reglamento de Zonificación, que será aplicado en la totalidad del territorio del cantón de {{canton}}, de acuerdo con lo dispuesto en la Ley de Planificación Urbana N.º 4240 del 15 de noviembre de 1968, sin perjuicio de las facultades que la ley otorga al Ministerio de Salud y a la Dirección de Urbanismo del Instituto Nacional de Vivienda y Urbanismo.
@@ -281,11 +284,10 @@ Los corredores biológicos que deben conservarse dentro de los predios se regula
 ]
 };
 
-/* 02 Fraccionamiento y Urbanizaciones: adaptado del Reglamento de Fraccionamiento y Urbanización del Plan Regulador de Liberia. */
+/* 02 Fraccionamiento y Urbanizaciones. */
 window.REG_BASE['02'] = {
 id: '02',
 t: 'Reglamento de Fraccionamiento y Urbanizaciones',
-fuente: 'Borrador adaptado del Reglamento de Fraccionamiento y Urbanización del Plan Regulador de Liberia. Los valores salen del calibrador.',
 caps: [
 { t: 'Disposiciones generales',
   x: `Que el artículo 50 de la Constitución Política establece a favor de todos los habitantes de la República el derecho a un ambiente sano y ecológicamente equilibrado, que incluye la conservación, el uso y el manejo sostenible del medio ambiente, así como el cumplimiento de la función social de la propiedad.
@@ -517,14 +519,14 @@ Cuando corresponda, deben presentarse además los alineamientos de áreas de pro
 ]
 };
 
-/* 03 Mapa Oficial: adaptado del Reglamento de Mapa Oficial del Plan Regulador de Liberia.
-   Este reglamento es, sobre todo, un inventario cartográfico propio de cada cantón: las grandes tablas
-   de bienes públicos, vialidad y zonas de interés municipal de Liberia no se copiaron (son de ese cantón),
-   y quedan como [[ ]] para que cada municipalidad incorpore su propio inventario como anexo. */
+/* 03 Mapa Oficial.
+   Este reglamento es, sobre todo, un inventario cartográfico propio de cada cantón: las grandes
+   tablas de bienes públicos, vialidad y zonas de interés municipal quedan como [[ ]] para que
+   cada municipalidad incorpore su propio inventario como anexo. */
 window.REG_BASE['03'] = {
 id: '03',
 t: 'Reglamento de Mapa Oficial',
-fuente: 'Borrador adaptado del Reglamento de Mapa Oficial del Plan Regulador de Liberia. Las tablas de inventario (bienes públicos, vialidad, zonas de interés municipal) son propias de cada cantón y deben incorporarse como anexo.',
+fuente: 'Las tablas de inventario (bienes públicos, vialidad, zonas de interés municipal) son propias de cada cantón y deben incorporarse como anexo.',
 caps: [
 { t: 'Disposiciones generales',
   x: `Que el Mapa Oficial es la representación cartográfica del conjunto de planos que indica con claridad los trazados de vías públicas y las áreas de reserva para usos y servicios comunales, que se rigen por el régimen jurídico aplicable conforme a la Ley de Planificación Urbana N.º 4240 y demás normativa vigente en materia de dominio público.
@@ -583,12 +585,13 @@ El Mapa Oficial puede ser actualizado por la Municipalidad según se incorporen 
 ]
 };
 
-/* 04 Renovación Urbana e Instrumentos de Gestión del Suelo: adaptado del reglamento homónimo del Plan Regulador de Liberia.
-   Los listados de proyectos (RUA/RUV/RUU) y sus áreas son inventarios propios de cada cantón y quedan como [[ ]]. */
+/* 04 Renovación Urbana e Instrumentos de Gestión del Suelo.
+   Los listados de proyectos (RUA/RUV/RUU) y sus áreas son inventarios propios de cada cantón y
+   quedan como [[ ]]. */
 window.REG_BASE['04'] = {
 id: '04',
 t: 'Reglamento de Renovación Urbana e Instrumentos de Gestión del Suelo',
-fuente: 'Borrador adaptado del Reglamento de Renovación Urbana e Instrumentos de Gestión del Suelo del Plan Regulador de Liberia. Los listados de proyectos de renovación urbana son propios de cada cantón.',
+fuente: 'Los listados de proyectos de renovación urbana son propios de cada cantón.',
 caps: [
 { t: 'Disposiciones generales',
   x: `Que el artículo 50 de la Constitución Política consagra el derecho de toda persona a un ambiente sano y ecológicamente equilibrado, lo cual implica la obligación del Estado y de las municipalidades de velar por el uso sostenible del suelo urbano, el acceso equitativo a los servicios y espacios públicos, y la función social de la propiedad.
