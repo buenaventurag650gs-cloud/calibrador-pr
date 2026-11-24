@@ -773,6 +773,16 @@ async function downloadPdf(){
   const pxPerMM=(CSSW*SCALE)/contentWmm;
   const cssPxPerMM=CSSW/contentWmm; // para ubicar los enlaces del índice (sin el SCALE del canvas)
   const pageHpxCSS=(pageH-margin*2)*(CSSW/contentWmm); // alto de página en css px, sin escalar
+  /* html2canvas mide el texto con su propio motor, no con el del navegador, así que un grupo
+     que por offsetHeight cabe justo en una página puede, al rasterizarse, salir un pelín más
+     alto que pageHpxCSS·SCALE — y entonces addCanvas lo reparte en una página extra que nadie
+     anticipó. Eso ya pasaba antes de la numeración de capítulos (una página casi en blanco con
+     solo la última línea desbordada), pero ahora además desfasa el índice: su número de página
+     y sus enlaces se calculan de antemano, antes de dibujar nada. Por eso el agrupamiento (y
+     solo el agrupamiento) usa un alto algo menor —deja un colchón de una línea de texto— para
+     que lo previsto y lo dibujado coincidan siempre; addCanvas sigue recortando contra el alto
+     real de la página, así que ese colchón nunca se pierde, solo se deja de usar al límite. */
+  const pageHpxPlan=pageHpxCSS-18;
   // El PDF siempre es claro, sin importar el tema de la pantalla: se fuerza mientras se genera.
   const root=document.documentElement, prevTheme=root.getAttribute('data-theme');
   root.setAttribute('data-theme','light');
@@ -817,20 +827,23 @@ async function downloadPdf(){
     // vive en la portada y ahora también arriba del índice, así ninguna página de contenido
     // queda huérfana con solo ese rótulo antes de la primera subportada.
     host.innerHTML=hyph(blocksHTML(B.blocks));
-    document.body.appendChild(host);
+    document.body.appendChild(host); renderHosts.push(host);
     const head=`<header class="rg-head"><div class="ey">Plan Regulador del cantón de ${esc(s.datos.canton||'')}</div><h2>${esc(B.reg.t)}</h2>${B.reg.fuente?`<p class="hint">${esc(B.reg.fuente)}</p>`:''}</header>`;
     const idxHost=mkHost();
     idxHost.innerHTML=hyph(head)+buildIndexHTML(B.reg);
-    document.body.appendChild(idxHost);
+    document.body.appendChild(idxHost); renderHosts.push(idxHost);
     c.refreshIcons&&c.refreshIcons();
     await av.paso('Midiendo dónde cae cada corte de página…',10,FRASES[1]);
     await new Promise(r=>setTimeout(r,60));
     // agrupar los hijos del documento (y del índice) en páginas, cortando entre bloques
     // (nunca a mitad de una tabla o un párrafo). offsetTop, no la suma de offsetHeight, porque
-    // los márgenes entre bloques colapsan en el flujo original.
-    const contentPages=groupByHeight(Array.from(host.children),pageHpxCSS,el=>el.classList.contains('rg-cap'));
-    const idxPages=groupByHeight(Array.from(idxHost.children),pageHpxCSS);
-    const IDX=idxPages.filter(p=>p.length).length||1;
+    // los márgenes entre bloques colapsan en el flujo original. pageHpxPlan deja un pequeño
+    // colchón: así el agrupamiento casi nunca queda tan justo que, al rasterizar, html2canvas
+    // (que mide el texto con su propio motor, no con el del navegador) lo empuje a una página
+    // de más sin que nadie lo haya previsto.
+    const contentPages=groupByHeight(Array.from(host.children),pageHpxPlan,el=>el.classList.contains('rg-cap'));
+    const idxPages=groupByHeight(Array.from(idxHost.children),pageHpxPlan).filter(p=>p.length);
+    const IDX=idxPages.length||1;
     // intercala, antes del primer grupo de cada capítulo, el paso de su subportada
     const plan=[];
     contentPages.forEach(grp=>{
@@ -839,63 +852,73 @@ async function downloadPdf(){
       if(first.classList&&first.classList.contains('rg-cap')) plan.push({tipo:'sub',ci:+first.dataset.ci});
       plan.push({tipo:'cont',grupo:grp});
     });
-    /* Página real de cada capítulo (a dónde salta el índice) y número total de páginas: una
-       pasada "en seco" sobre el plan, sin dibujar nada todavía. Un bloque más alto que una
-       página —una tabla larga— se reparte en varias; por eso addCanvas puede dar alguna
-       página más de la prevista, y el total final sigue siendo una estimación hasta el cierre. */
-    let cursor=1+IDX; // 1 = portada
-    const capPagina={};
-    plan.forEach(paso=>{
-      if(paso.tipo==='sub'){ cursor++; capPagina[paso.ci]=cursor; }
-      else cursor+=predictPages(paso.grupo,pageHpxCSS);
-    });
-    const estimadas=cursor;
-    idxHost.querySelectorAll('.rg-idx-pg').forEach(sp=>{
-      const n=capPagina[+sp.dataset.pg];
-      sp.textContent=n!=null?'pág. '+n:'';
-    });
+    /* Número total de páginas: una estimación nada más, solo para la barra de avance (un
+       bloque más alto que una página se reparte en varias al dibujarlo, y puede salir alguna
+       de más). El número de página real de cada capítulo —el que de verdad importa, porque
+       ahí apunta el índice— no se adivina: se toma de doc.getNumberOfPages() en el momento
+       mismo en que esa subportada queda dibujada, más abajo. */
+    const estimadas=1+IDX+plan.reduce((n,p)=>n+(p.tipo==='sub'?1:predictPages(p.grupo,pageHpxPlan)),0);
     const {jsPDF}=window.jspdf; const doc=new jsPDF({unit:'mm',format:'letter',orientation:'portrait'});
     await av.paso(`Serán unas ${estimadas} páginas. Dibujando la portada…`,13,'Sellando la portada con el escudo');
     const coverCanvas=await renderPage(coverHost);
     addCanvas(doc,coverCanvas,true);
-    await av.paso('Dibujando el índice…',16,'Numerando los capítulos');
-    for(const grupo of idxPages){
-      if(!grupo.length) continue;
-      if(av.cancelado){ c.toast('Generación cancelada'); return; }
-      const pageHost=mkHost();
-      grupo.forEach(el=>pageHost.appendChild(el.cloneNode(true)));
-      const canvas=await renderPage(pageHost);
-      addCanvas(doc,canvas,false);
-      // los enlaces del índice se agregan sobre la página que acaba de quedar activa en el PDF
-      pageHost.querySelectorAll('.rg-idx-row[data-ci]').forEach(row=>{
-        const destino=capPagina[+row.dataset.ci]; if(destino==null) return;
-        const mmY=margin+row.offsetTop/cssPxPerMM, mmH=row.offsetHeight/cssPxPerMM;
-        doc.link(margin,mmY,contentWmm,mmH,{pageNumber:destino});
-      });
-    }
+    // El contenido se dibuja primero (el índice va al final y luego se trae al frente) para
+    // que cada subportada quede numerada con la página real que le tocó, no con una prevista.
     const fotos=await fotosP;
+    const capPagina={};
     let i=0;
     for(const paso of plan){
       if(av.cancelado) { c.toast('Generación cancelada'); return; }
       if(paso.tipo==='sub'){
         const cap=B.reg.caps[paso.ci];
-        await av.paso(`Abriendo el capítulo ${ROM[paso.ci+1]||paso.ci+1}…`,15+(80*(doc.getNumberOfPages())/estimadas),
+        await av.paso(`Abriendo el capítulo ${ROM[paso.ci+1]||paso.ci+1}…`,15+(70*(doc.getNumberOfPages())/estimadas),
           fotos[paso.ci]?'Vistiendo la subportada con la foto aérea':'Dejando lista la subportada del capítulo');
         const subHost=mkHost();
         subHost.style.height=pageHpxCSS+'px';
         subHost.innerHTML=hyph(buildSubHTML(cap,paso.ci,fotos[paso.ci]));
         const canvas=await renderPage(subHost);
         addCanvas(doc,canvas,false);
+        capPagina[paso.ci]=doc.getNumberOfPages(); // página real, sin el índice contado todavía
         continue;
       }
       i++;
-      // de 15 % a 95 %: el tramo largo es dibujar las páginas, que es lo que de verdad tarda
-      await av.paso(`Dibujando la página ${doc.getNumberOfPages()+1}…`,15+(80*i/estimadas),FRASES[(i-1)%FRASES.length]);
+      // de 15 % a 85 %: el tramo largo es dibujar las páginas, que es lo que de verdad tarda
+      await av.paso(`Dibujando la página ${doc.getNumberOfPages()+1}…`,15+(70*i/estimadas),FRASES[(i-1)%FRASES.length]);
       const pageHost=mkHost();
       paso.grupo.forEach(el=>pageHost.appendChild(el.cloneNode(true)));
       const canvas=await renderPage(pageHost);
       addCanvas(doc,canvas,false);
     }
+    // Ahora sí se conoce la página real de cada capítulo: se completa el índice con el número
+    // que le toca una vez antepuesto (más adelante) el propio índice.
+    idxHost.querySelectorAll('.rg-idx-pg').forEach(sp=>{
+      const n=capPagina[+sp.dataset.pg];
+      sp.textContent=n!=null?'pág. '+(n+IDX):'';
+    });
+    await av.paso('Dibujando el índice…',88,'Numerando los capítulos');
+    const idxRows=[]; // {ci, gi, mmY, mmH} — para los enlaces, una vez reordenadas las páginas
+    for(let gi=0;gi<idxPages.length;gi++){
+      if(av.cancelado){ c.toast('Generación cancelada'); return; }
+      const pageHost=mkHost();
+      idxPages[gi].forEach(el=>pageHost.appendChild(el.cloneNode(true)));
+      const canvas=await renderPage(pageHost); // ya deja pageHost en el documento, medible
+      pageHost.querySelectorAll('.rg-idx-row[data-ci]').forEach(row=>{
+        idxRows.push({ci:+row.dataset.ci,gi,mmY:margin+row.offsetTop/cssPxPerMM,mmH:row.offsetHeight/cssPxPerMM});
+      });
+      addCanvas(doc,canvas,false);
+    }
+    // El índice quedó al final del documento; se trae al frente —justo después de la
+    // portada— moviendo siempre la última página a la posición 2. jsPDF reubica la página
+    // entera, pero NO sigue a los enlaces ya creados sobre ella (quedarían apuntando al
+    // número de página viejo), así que los enlaces del índice se agregan después de este
+    // paso, ya con el documento en su orden definitivo.
+    for(let k=0;k<IDX;k++) doc.movePage(doc.getNumberOfPages(),2);
+    idxRows.forEach(({ci,gi,mmY,mmH})=>{
+      const destino=capPagina[ci]; if(destino==null) return;
+      doc.setPage(2+gi);
+      doc.link(margin,mmY,contentWmm,mmH,{pageNumber:destino+IDX});
+    });
+    doc.setPage(doc.getNumberOfPages());
     await av.paso('Cerrando el documento…',97,'Listo para firmar');
     const name=`PR_${(s.datos.canton||'canton').replace(/[^\wÁÉÍÓÚÑáéíóúñ]+/g,'_')}_-_${s.regSel}_${NOMBRES[s.regSel].replace(/\s+/g,'_')}.pdf`;
     const paginas=doc.getNumberOfPages();

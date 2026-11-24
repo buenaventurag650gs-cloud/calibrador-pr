@@ -684,3 +684,124 @@ El monto a recaudar toma en cuenta: el costo total de la obra, la definición de
 }
 ]
 };
+
+/* 05 Construcciones.
+   Este reglamento no repite el Reglamento de Construcciones del INVU: se limita a las
+   particularidades locales que ese cuerpo normativo nacional remite a cada plan regulador
+   (edificabilidad, retiros, estacionamientos e incentivos por zona), conforme al {{art:...}}
+   complementariedad del primer capítulo. Para todo lo demás —seguridad humana, instalaciones,
+   accesibilidad, sismorresistencia— rige el Reglamento de Construcciones vigente y sus reformas. */
+window.REG_BASE['05'] = {
+id: '05',
+t: 'Reglamento de Construcciones',
+caps: [
+{ t: 'Disposiciones generales',
+  x: `Que el Reglamento de Construcciones del Instituto Nacional de Vivienda y Urbanismo (INVU) constituye la norma técnica nacional aplicable a toda edificación en el territorio costarricense, y que corresponde a cada plan regulador particularizar, dentro de su propio cantón, los parámetros de edificabilidad, emplazamiento y servicios que esa norma nacional remite expresamente a la reglamentación local.
+Que, en consecuencia, el presente reglamento no sustituye ni reproduce las disposiciones técnicas del Reglamento de Construcciones del INVU en materias como la seguridad humana, la protección contra incendios, las instalaciones electromecánicas, la accesibilidad o el diseño sismorresistente, las cuales mantienen plena vigencia y se aplican de forma directa y complementaria a lo dispuesto en este cuerpo normativo.
+Que la edificabilidad de cada zona —cobertura, coeficiente de aprovechamiento, altura, retiros y área permeable— ya fue fijada, zona por zona, en la ficha de parámetros del Reglamento de Zonificación y Forma Urbana; este reglamento desarrolla la forma en que esos parámetros se miden, se aplican y se excepcionan al momento de tramitar un permiso de construcción.`,
+  arts: [
+  { id: 'objeto', t: 'Objeto y alcance', x: `El presente reglamento tiene por objeto establecer las disposiciones constructivas propias del cantón de {{canton}} que complementan al Reglamento de Construcciones del INVU, en lo relativo a la edificabilidad por zona, el emplazamiento de las edificaciones dentro del lote, los estacionamientos, la infraestructura mínima de servicios, la gestión del riesgo, el paisaje y el patrimonio, y los incentivos constructivos.
+Toda persona física o jurídica que construya, amplíe, remodele o demuela una edificación dentro del cantón debe cumplir, además de lo dispuesto en este reglamento, con el Reglamento de Construcciones del INVU, el Código Sísmico de Costa Rica, el Código Eléctrico Nacional y las demás normas técnicas sectoriales vigentes. En caso de discrepancia entre este reglamento y la normativa nacional citada, prevalecerá la disposición más restrictiva en materia de seguridad y la más específica en materia de ordenamiento territorial.` },
+  { id: 'permiso-construccion', t: 'Permiso de construcción y profesional responsable', x: `Ninguna obra de construcción, ampliación, remodelación o demolición puede iniciarse sin contar previamente con el permiso de construcción municipal y, cuando corresponda, con el visado del Colegio Federado de Ingenieros y de Arquitectos de Costa Rica.
+Todo proyecto debe contar con un profesional responsable debidamente incorporado al colegio profesional correspondiente, quien responde técnica y legalmente por el cumplimiento de los planos constructivos, las especificaciones técnicas y la normativa aplicable durante la ejecución de la obra.
+La documentación técnica mínima para el trámite del permiso —planos constructivos, memoria de cálculo, certificado de uso de suelo y disponibilidad de servicios— es la establecida por el Reglamento de Construcciones del INVU y por los requisitos administrativos vigentes de la Municipalidad.` },
+  { id: 'obras-menores', t: 'Obras menores', x: `Se consideran obras menores aquellas intervenciones de bajo impacto estructural y urbanístico —tales como reparaciones, cerramientos, obras de mantenimiento o ampliaciones de pequeña escala— que, por su naturaleza, pueden tramitarse mediante el procedimiento simplificado que defina la Municipalidad, conforme a los criterios que para ello establece el Reglamento de Construcciones del INVU.
+La calificación de una obra como menor no exime del cumplimiento de los parámetros de edificabilidad, retiros y demás disposiciones de este reglamento, ni de las normas de seguridad estructural aplicables.` }
+  ]
+},
+{ t: 'Edificabilidad y volumetría',
+  x: `Que los parámetros de edificabilidad fijados por zona en el Reglamento de Zonificación y Forma Urbana requieren reglas uniformes de medición, de forma que su aplicación sea verificable y consistente en todo el cantón, independientemente de la forma particular de cada lote.`,
+  arts: [
+  { id: 'cobertura', t: 'Cobertura del terreno', x: `La cobertura máxima autorizada por zona es la establecida en la ficha de parámetros de cada zona del Reglamento de Zonificación y Forma Urbana.
+{{tabla:D01|Cobertura máxima por zona}}
+Para efectos de este cálculo, se computa como cobertura la proyección horizontal de toda construcción techada, cubierta o volada sobre el nivel del terreno, incluidos los aleros que excedan de [[0,60 m]] de vuelo. No computan dentro de la cobertura las piscinas descubiertas, las terrazas sin techar al nivel del terreno natural ni las áreas permeables bajo cubiertas ligeras desmontables.` },
+  { id: 'aprovechamiento', t: 'Coeficiente de aprovechamiento', x: `El coeficiente de aprovechamiento urbano (CAU) máximo autorizado por zona, sin incentivos, es el establecido en la ficha de parámetros de cada zona.
+{{tabla:D02|Coeficiente de aprovechamiento por zona}}
+El coeficiente de aprovechamiento se calcula como la razón entre el área total construida, sumada en todos los niveles de la edificación, y el área del lote. No se contabilizan dentro del área construida los entrepisos técnicos no habitables, los tanques de agua, los cuartos de máquinas y las áreas comunes de estacionamiento techado.` },
+  { id: 'altura', t: 'Altura máxima', x: `La altura máxima autorizada por zona, expresada en número de pisos, es la establecida en la ficha de parámetros de cada zona.
+{{tabla:D03|Altura máxima por zona}}
+La altura se mide verticalmente desde el nivel de piso de la construcción, definido conforme al Reglamento de Construcciones del INVU, hasta la cara superior del entrepiso del último nivel habitable. No se contabilizan dentro de la altura los tanques de agua, cuartos de máquinas, antenas, pararrayos ni demás elementos técnicos que sobresalgan de la cubierta, siempre que su área no exceda [[25 %]] del área de la cubierta y se retiren de la fachada al menos la misma distancia que su propia altura.` },
+  { id: 'permeabilidad', t: 'Área permeable mínima', x: `El área permeable mínima exigida por zona es la establecida en la ficha de parámetros de cada zona.
+{{tabla:D05|Área permeable mínima por zona}}
+Se considera área permeable toda superficie del lote que permita la infiltración natural del agua de lluvia al subsuelo: suelo natural, jardines, y pavimentos o superficies permeables certificadas conforme a las soluciones basadas en la naturaleza que defina la Municipalidad. El cumplimiento de este requisito se verifica de forma conjunta con el sistema de retención o infiltración de aguas pluviales exigido en el {{art:infraestructura-servicios}}.` },
+  { id: 'retiros', t: 'Retiros', x: `Los retiros mínimos frontal, laterales y posterior exigidos por zona son los establecidos en la ficha de parámetros de cada zona.
+{{tabla:E01,E02|Retiros por zona}}
+Dentro del retiro frontal se permiten únicamente casetas de guarda, cubiertas de ingreso, rampas de acceso vehicular y jardineras, sin que estas construcciones puedan techarse de forma continua ni destinarse a un uso habitable. Los retiros laterales y posterior pueden ocuparse con cuartos de basura, tanques de agua y cuartos de máquinas, siempre que no excedan [[2,20 m]] de altura y se ubiquen separados de la colindancia conforme a lo dispuesto sobre ventanas y construcciones cerca de colindancias en el Reglamento de Construcciones del INVU.` },
+  { id: 'tipologias', t: 'Tipologías edificatorias', x: `Las tipologías edificatorias permitidas por zona son las establecidas en la ficha de parámetros de cada zona, y se definen de la siguiente manera:
+a) Aislada: la edificación se separa de todas sus colindancias mediante retiros.
+b) Pareada: la edificación comparte una colindancia lateral con la edificación vecina, dejando libres el retiro frontal, el retiro posterior y el retiro lateral restante.
+c) Continua: la edificación se adosa a ambas colindancias laterales, dejando libres únicamente el retiro frontal y el posterior, conforme a la configuración de fachada continua propia de las zonas más urbanas del transecto.
+d) Multifamiliar: varias unidades habitacionales comparten una misma edificación, estructura o terreno, bajo el régimen de propiedad horizontal o de condominio que corresponda.
+e) Edificación agrícola: construcciones vinculadas a la producción agropecuaria, con parámetros de retiro y cobertura propios de las zonas rurales del transecto.
+{{tabla:E03|Tipologías permitidas por zona}}` },
+  { id: 'estacionamiento', t: 'Estacionamiento', x: `La cantidad de espacios de estacionamiento exigidos, o el máximo permitido según el uso de la edificación, así como su ubicación dentro del lote, son los siguientes:
+{{tabla:E06|Estacionamiento por zona}}
+Los espacios de estacionamiento no pueden ubicarse dentro del retiro frontal como área techada ni invadir la acera; su diseño, dimensiones, pendientes y señalización deben coordinarse con el Reglamento de Vialidad y Movilidad. Del total de espacios exigidos, al menos uno de cada [[25]] debe reservarse y señalizarse para personas con discapacidad, conforme a la Ley N.º 7600 y su reglamento.` }
+  ]
+},
+{ t: 'Usos de mayor escala',
+  arts: [
+  { id: 'escala-actividad', t: 'Escala máxima de actividad no residencial', x: `El área máxima de piso autorizada para un establecimiento no residencial dentro de cada zona es la siguiente:
+{{tabla:B05|Escala máxima de actividad por zona}}
+Un proyecto que exceda este umbral debe fraccionar su operación en unidades independientes que cumplan individualmente con el límite de escala, o bien ubicarse en una zona cuya escala máxima lo permita. Esta limitación busca mantener una escala de actividad compatible con el carácter urbano de cada zona del transecto.` },
+  { id: 'hospedaje', t: 'Hospedaje y turismo', x: `El tipo y el tamaño máximo de los establecimientos de hospedaje autorizados por zona son los siguientes:
+{{tabla:B07|Hospedaje y turismo por zona}}
+Los establecimientos de hospedaje deben, además, contar con la declaratoria turística correspondiente del Instituto Costarricense de Turismo cuando la actividad así lo requiera, sin perjuicio del cumplimiento de los demás parámetros de edificabilidad y estacionamiento de la zona donde se ubiquen.` }
+  ]
+},
+{ t: 'Emplazamiento y movimientos de tierra',
+  arts: [
+  { id: 'emplazamiento-cerramientos', t: 'Emplazamiento en el terreno y cerramientos', x: `[[El emplazamiento en el terreno aplica fuera del cuadrante urbano; los cerramientos aplican en todas las zonas.]]
+Fuera del cuadrante urbano, la ubicación de la edificación dentro del lote debe responder a las siguientes condiciones del terreno:
+{{tabla:E04|Emplazamiento en el terreno por zona}}
+a) Debe evitarse el emplazamiento sobre pendientes superiores al [[30 %]], cumbres y bordes de bosque, salvo que un estudio técnico avale la estabilidad del sitio.
+b) La edificación debe orientarse de manera que minimice la afectación de las cuencas visuales protegidas conforme al {{art:paisaje-patrimonio}}.
+El tipo de cerramiento permitido hacia la vía pública, su porcentaje mínimo de transparencia y la posibilidad de sustituirlo por cercas vivas son los siguientes:
+{{tabla:E05|Frente y cerramientos por zona}}` },
+  { id: 'movimientos-tierra', t: 'Movimientos de tierra', x: `[[Artículo aplicable fuera del cuadrante urbano. Revisar si corresponde dentro de él según la topografía del cantón.]]
+La altura máxima de corte y de relleno autorizada para habilitar un lote fuera del cuadrante urbano es la siguiente:
+{{tabla:E07|Movimientos de tierra por zona}}
+Todo movimiento de tierra que exceda este umbral, o que se realice sobre taludes y laderas con pendientes pronunciadas, requiere un estudio geotécnico que respalde la estabilidad del talud resultante, conforme a lo dispuesto sobre cimentaciones y taludes en el Reglamento de Construcciones del INVU. Los taludes resultantes deben protegerse contra la erosión mediante cobertura vegetal u obras de estabilización.` }
+  ]
+},
+{ t: 'Infraestructura y servicios públicos',
+  arts: [
+  { id: 'infraestructura-servicios', t: 'Disponibilidad de servicios públicos', x: `Todo permiso de construcción está condicionado a la disponibilidad de los servicios públicos básicos exigidos para la zona correspondiente:
+{{tabla:G01,G02,G03,G04,G05|Infraestructura y servicios públicos por zona}}
+a) Agua potable: debe acreditarse mediante constancia de disponibilidad emitida por el ente operador (AyA, ASADA o acueducto municipal) que corresponda, con indicación del caudal disponible.
+b) Saneamiento: el sistema exigido —tanque séptico, planta de tratamiento o conexión al alcantarillado sanitario— depende de la densidad del proyecto y debe contar con la aprobación del Ministerio de Salud.
+c) Aguas pluviales: todo proyecto debe retener o infiltrar en sitio el volumen de agua pluvial que determine el estudio hidrológico correspondiente, conforme al {{art:permeabilidad}}.
+d) Energía y telecomunicaciones: el proyecto debe prever la infraestructura necesaria para su conexión a las redes de energía eléctrica y telecomunicaciones existentes, soterrada cuando así lo exija la zona.
+e) Residuos sólidos: todo proyecto debe disponer de un espacio de acopio para la separación de residuos, dimensionado según el uso y la población de la edificación, conforme a la Ley para la Gestión Integral de Residuos N.º 8839.` }
+  ]
+},
+{ t: 'Riesgo, paisaje y patrimonio',
+  arts: [
+  { id: 'amenazas', t: 'Amenazas naturales', x: `Las restricciones constructivas aplicables por nivel de amenaza natural —inundación, deslizamiento, falla geológica o incendio forestal— son las siguientes:
+{{tabla:H04|Amenazas naturales por zona}}
+Todo proyecto ubicado en una zona con amenaza media o alta debe sustentarse en el estudio técnico correspondiente, avalado por la Comisión Nacional de Prevención de Riesgos y Atención de Emergencias (CNE) cuando así lo exija la normativa sectorial, como condición previa al otorgamiento del permiso de construcción.` },
+  { id: 'paisaje-patrimonio', t: 'Paisaje y patrimonio cultural', x: `Las edificaciones deben respetar las cuencas visuales, cumbres e hitos paisajísticos protegidos, así como los bienes y sitios de valor patrimonial o arqueológico identificados por zona:
+{{tabla:H06,H07|Paisaje y patrimonio cultural por zona}}
+Toda intervención sobre un inmueble con declaratoria de patrimonio histórico-arquitectónico requiere el criterio previo del Centro de Investigación y Conservación del Patrimonio Cultural (CICPC) y debe conservar los elementos que motivaron su declaratoria, conforme a la Ley de Patrimonio Histórico-Arquitectónico N.º 7555. El hallazgo de bienes arqueológicos durante una obra obliga a su paralización inmediata y a la notificación al Museo Nacional, conforme a la Ley N.º 6703.` }
+  ]
+},
+{ t: 'Arborización e incentivos constructivos',
+  arts: [
+  { id: 'arborizacion', t: 'Protección y plan de arborización', x: `[[Artículo exigible dentro del cuadrante urbano.]]
+Todo desarrollo que requiera evaluación de impacto ambiental, así como las obras municipales que intervengan el arbolado urbano, deben contar con un Plan de Protección del Árbol Urbano o un Plan de Arborización, según corresponda:
+{{tabla:I05|Planes de protección y arborización por zona}}
+Estos planes deben identificar los individuos arbóreos existentes, su estado fitosanitario y las medidas de protección, trasplante o reposición aplicables, conforme a la Ley de Protección al Ciudadano del Exceso de Requisitos y Trámites Administrativos N.º 10939 y a la Ley Orgánica del Ambiente N.º 7554.` },
+  { id: 'incentivos-construccion', t: 'Aplicación constructiva de los incentivos', x: `Cuando un proyecto cuente con el aval municipal para acceder a los incentivos urbanísticos definidos en el Reglamento de Zonificación y Forma Urbana y en el Reglamento de Renovación Urbana e Instrumentos de Gestión del Suelo, el beneficio constructivo que se traslada a los parámetros del permiso de construcción —altura, coeficiente de aprovechamiento o cobertura adicional— es el siguiente:
+{{tabla:J05|Beneficio constructivo por incentivos, por zona}}
+La verificación del cumplimiento de las condiciones que dan derecho al incentivo corresponde a la Municipalidad, como parte del trámite ordinario de aprobación del permiso de construcción, y debe constar expresamente en los planos constructivos visados.` }
+  ]
+},
+{ t: 'Disposiciones finales',
+  arts: [
+  { id: 'complementariedad-invu', t: 'Complementariedad con la normativa nacional', x: `En todo lo no previsto expresamente en este reglamento, rige de forma directa y complementaria el Reglamento de Construcciones del INVU y las demás normas técnicas nacionales vigentes en materia de seguridad humana, protección contra incendios, instalaciones electromecánicas, accesibilidad y diseño sismorresistente.
+Las infracciones a este reglamento se sancionan conforme al procedimiento y a las sanciones que establece el Reglamento de Construcciones del INVU, sin perjuicio de las potestades propias de la Municipalidad en materia de clausura y demolición de obras.` },
+  { id: 'vigencia-05', t: 'Vigencia', x: `El presente reglamento rige a partir de su publicación en el Diario Oficial La Gaceta, conforme a lo dispuesto en el artículo 17 de la Ley de Planificación Urbana N.º 4240, y se mantiene vigente mientras no sea modificado mediante el mismo procedimiento.` }
+  ]
+}
+]
+};
